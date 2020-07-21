@@ -1,0 +1,153 @@
+@import './_variables.scss';
+@import './_mixin.scss';
+@import './_transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+@import './function.scss';
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  padding-right:0 !important;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+body{
+  min-width: 1090px;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  outline: none;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, li{
+  padding: 0px;
+  list-style: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+.table-wrap{
+  margin: 0;
+  padding: 0;
+}
+
+//main-container全局样式
+.app-main {
+  min-height: 100%;
+}
+
+.app-container {
+  padding: 20px;
+  background: #f5f6f6;
+}
+
+.el-pagination.is-background {
+  .btn-prev,.btn-next{
+    margin: 0px !important;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+  }
+  .btn-prev{
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  .btn-next{
+    border-right: 1px solid #ddd;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+  .el-pager{
+    li{
+      margin: 0px !important;
+      border: 1px solid #ddd;
+      border-left: none;
+      border-radius: 0 !important;
+    }
+    .active{
+      border: 1px solid #1282d5;
+    }
+  }
+}
+
+.right {
+  .el-input{ // 解决输入框和按钮不在同一行的问题
+    vertical-align: bottom;
+  }
+}
+
+.w-label {
+  padding-right: 8px;
+  color: #666;
+  text-align:justify;
+  text-justify:distribute-all-lines;/*ie6-8*/
+  text-align-last:justify;/* ie9*/
+  -moz-text-align-last:justify;/*ff*/
+  -webkit-text-align-last:justify;/*chrome 20+*/
+}
+//多tab title 行高
+.el-notification__content{
+  line-height: 12px;
+}
+//统计信息下拉框 
+.el-menu--popup{
+  min-width: 90px !important;
+}
+
+

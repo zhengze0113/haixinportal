@@ -1,0 +1,68 @@
+@import './_variables.scss';
+
+/* 字体水平对齐设置 */
+@each $p, $v in (c, center) (r, right) (l, left) {
+  .t#{$p} {
+    text-align: $v;
+  }
+}
+
+.left{
+  float: left;
+}
+.right{
+  float: right;
+}
+
+.link {
+  color: $linkColor;
+}
+
+
+.c-primary{
+  color: $primaryColor;
+}
+
+.c-success{
+  color: $successColor;
+}
+
+.c-warnging{
+  color: $warningColor;
+}
+
+.c-error{
+  color: $errorColor;
+}
+
+.c-info{
+  color: $infoColor;
+}
+
+.c-title{
+  color: $titleColor;
+}
+.c-txt{
+  color: $normalColor;
+}
+.c-placeholder{
+  color: $placeholderColor
+}
+
+
+@each $p, $v in ((ml, left) (mr, right) (mt, top) (mb, bottom)) {
+  @each $l in (5 10 15 20 30 40 50 60 100 150 200){
+    .#{$p}-#{$l}{
+      margin-#{$v}: #{$l}px;
+    }
+  }
+}
+
+/*width*/
+@each $v in (10, 20, 30, 40, 50, 60, 80, 90, 100, 120, 140, 150, 200, 300, 400) {
+  .w-#{$v}{
+    width: #{$v}px;
+  }
+}
+
+

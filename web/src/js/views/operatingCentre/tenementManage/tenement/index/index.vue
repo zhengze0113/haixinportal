@@ -1,0 +1,285 @@
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="24" :offset="0">
+        <div class="grid-content bg-purple">
+          <close-card :show-arrow="true" title="租户列表" icon="list">
+            <div class="right">
+              <el-input
+                v-model="searchInput"
+                placeholder="请输入内容"
+                suffix-icon="el-icon-search"
+                class="search-input"/>
+              <el-button-group>
+                <el-button type="primary" @click="dialogFormVisible = true">
+                  <svg-icon icon-class="plus"/>
+                  新建
+                </el-button>
+                <el-button>
+                  <svg-icon icon-class="delete"/>
+                  删除
+                </el-button>
+              </el-button-group>
+            </div>
+            <el-table
+              v-loading="listLoading"
+              :data="list"
+              :expand-row-keys="expandRowKeys"
+              size="small"
+              element-loading-text="Loading"
+              fit
+              highlight-current-row
+              row-key="id"
+              @row-click="handleRowClick"
+            >
+              <el-table-column
+                type="selection"
+                width="55"/>
+
+              <el-table-column type="expand" width="60">
+                <template slot-scope="props">
+                  <el-form label-position="left" inline class="demo-table-expand">
+                    <el-form-item label="机构名称">
+                      <span>所属机构</span>
+                    </el-form-item>
+                    <el-form-item label="角色">
+                      <span>所属角色</span>
+                    </el-form-item>
+                    <el-form-item label="办公地址">
+                      <span>办公地址</span>
+                    </el-form-item>
+                    <el-form-item label="联系人">
+                      <span>联系人1</span>
+                    </el-form-item>
+                    <!-- <el-form-item label="用户组">
+                      <span>用户组1</span>
+                    </el-form-item> -->
+                  </el-form>
+                </template>
+              </el-table-column>
+
+              <el-table-column label="姓名" width="60" align="center">
+                <template slot-scope="scope">
+                  <!--<router-link :to="{path: '/operatingCentre/tenementManage/tenementOrganization/detail/'+scope.row.id}" class="link">{{ scope.row.displayName }}</router-link>-->
+                  {{ scope.row.firstName }}
+                </template>
+              </el-table-column>
+              <el-table-column label="性别" width="110" align="center">
+                <template slot-scope="scope">
+                  <!--<router-link :to="{path: '/cloudService/partitionManage/detail/'+scope.row.id}" class="link">{{ scope.row.title }}</router-link>-->
+                  {{ scope.row.sex }}
+                </template>
+              </el-table-column>
+              <el-table-column label="描述" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.description }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="当前状态" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.status }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column class-name="status-col" label="操作状态" align="center">
+                <template slot-scope="scope">
+                  <el-tag type="success">{{ scope.row.operatingStatus }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" prop="created_at" label="创建时间" width="150">
+                <template slot-scope="scope">
+                  <i class="el-icon-time"/>
+                  <span>{{ scope.row.createTime }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" prop="created_at" label="最近修改时间" width="150">
+                <template slot-scope="scope">
+                  <i class="el-icon-time"/>
+                  <span>{{ scope.row.lastModifiedTime }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                fixed="right"
+                label="操作"
+                width="180">
+                <template slot-scope="scope">
+                  <div class="table-operator">
+                    <el-button type="text" size="small" @click="handleClick(scope.row)">
+                      <i class="el-icon-view"/>
+                      查看
+                    </el-button>
+                    <el-button type="text" size="small">
+                      <i class="el-icon-edit"/>
+                      编辑
+                    </el-button>
+                    <el-dropdown szie="small" class="operator-dropdown">
+                      <span class="el-dropdown-link">
+                        <el-button type="text" size="small">更多</el-button><i class="el-icon-arrow-down el-icon--right"/>
+                      </span>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>
+                          <i class="el-icon-delete"/>
+                          删除
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination :table-change="tableChange"/>
+          </close-card>
+        </div>
+      </el-col>
+    </el-row>
+    <el-dialog :visible.sync="dialogFormVisible" title="新建" size="mini">
+      <el-form :model="formInline" class="demo-form-inline" label-position="left" label-width="80px" >
+        <el-form-item label="姓名">
+          <el-input v-model="formInline.user" placeholder="姓名"/>
+        </el-form-item>
+        <el-form-item label="性别" >
+          <el-select v-model="formInline.region" placeholder="性别">
+            <el-option label="男" value="男"/>
+            <el-option label="女" value="女"/>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="所属机构">
+          <el-input v-model="formInline.user" placeholder="所属机构"/>
+        </el-form-item>
+
+        <el-form-item label="角色">
+          <el-input v-model="formInline.user" placeholder="角色"/>
+        </el-form-item>
+
+        <!-- <el-form-item label="用户组">
+          <el-input v-model="formInline.user" placeholder="用户组"/>
+        </el-form-item> -->
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" size="small" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+
+</template>
+
+<script>
+import { getOrganization } from '@/api/table';
+import Pagination from '@/components/pagination';
+
+export default {
+  components: {
+    Pagination
+  },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'gray',
+        deleted: 'danger'
+      };
+      return statusMap[status];
+    }
+  },
+  data() {
+    return {
+      list: [],
+      listLoading: true,
+      searchInput: '',
+      expandRowKeys: [],
+      dialogFormVisible: false,
+      formInline: {
+        user: '',
+        region: ''
+      },
+      value1: ''
+    };
+  },
+  created() {
+    this.fetchData();
+  },
+  methods: {
+    fetchData() {
+      this.listLoading = true;
+      getOrganization(this.listQuery).then(response => {
+        this.list = response.data.items;
+        console.log(this.list);
+        this.listLoading = false;
+      });
+    },
+    tableChange(pagination) {
+      this.fetchData();
+    },
+    handleRowClick(row, column, event) {
+      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      const index = this.expandRowKeys.indexOf(row.id);
+      if (index == -1) {
+        this.expandRowKeys.push(row.id);
+      } else {
+        this.expandRowKeys.splice(index, 1);
+      }
+    },
+    handleClick(row) {
+      console.log(row);
+    },
+    onSubmit() {
+      console.log('submit!');
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+
+  .icon-wrap {
+    float: left;
+    background: #00609e;
+    border-radius: 40px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    padding-top: 15px;
+    margin-right: 10px;
+
+    .icon {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  .txt-wrap {
+    display: inline-block;
+    margin-top: 10px;
+
+    .main-txt {
+      font-weight: bold;
+    }
+
+    .sub-txt {
+      margin-top: 8px;
+    }
+  }
+
+  .search-input {
+    width: 150px;
+    margin-right: 10px;
+  }
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 90px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
+  }
+</style>
+<style>
+  .el-notification__content{
+  line-height: 12px;
+}
+</style>

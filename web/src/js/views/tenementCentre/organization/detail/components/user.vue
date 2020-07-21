@@ -1,0 +1,481 @@
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="24" :offset="0">
+        <div class="grid-content bg-purple">
+          <div class="left">
+            <!-- <el-button
+              size="small"
+              icon="el-icon-plus"
+              type="primary"
+              @click="clickBindingUser()"
+            >绑定用户</el-button> -->
+            <!-- <el-button
+              size="small"
+              icon="el-icon-delete"
+              :disabled="disabled"
+              @click="deleteALLUser"
+            >批量删除</el-button>-->
+            <el-input v-model="searchInput" size="mini" placeholder="请输入用户名" class="search-input" />
+            <el-button size="small" icon="el-icon-search" @click="searchUser()">搜索</el-button>
+          </div>
+
+          <el-table
+            v-loading="listLoading"
+            :data="list"
+            :expand-row-keys="expandRowKeys"
+            size="small"
+            element-loading-text="Loading"
+            fit
+            highlight-current-row
+            row-key="id"
+            @row-click="handleRowClick"
+            @selection-change="handleSelectionChange"
+          >
+            <el-table-column type="selection" />
+
+            <el-table-column :show-overflow-tooltip="true" label="用户名" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.userName }}
+              </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="姓名" align="center">
+              <template slot-scope="scope">{{ scope.row.name }}</template>
+            </el-table-column>
+            <el-table-column label="状态" align="center">
+              <template slot-scope="scope">
+                <status-badge :status="scope.row.status" class="active"/>
+              </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="所属租户" align="center">
+              <template slot-scope="scope">{{ scope.row.tenantName }}</template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="电子邮箱" align="center">
+              <template slot-scope="scope">{{ scope.row.email }}</template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="电话" align="center">
+              <template slot-scope="scope">{{ scope.row.mobilePhone }}</template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="职位" align="center">
+              <template slot-scope="scope">{{ scope.row.position }}</template>
+            </el-table-column>
+            <el-table-column
+              :show-overflow-tooltip="true"
+              align="center"
+              prop="created_at"
+              label="创建时间"
+            >
+              <template slot-scope="scope">
+                <!--  <i class="el-icon-time"/>-->
+                <span>{{ scope.row.createTime| formatTime('yyyy-MM-dd hh:mm:ss') }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :show-overflow-tooltip="true"
+              align="center"
+              prop="created_at"
+              label="修改时间"
+            >
+              <template slot-scope="scope">
+                <!-- <i class="el-icon-time"/>
+                <span>{{ scope.row.modificationTime }}</span>-->
+                <span>{{ scope.row.createTime| formatTime('yyyy-MM-dd hh:mm:ss') }}</span>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column fixed="right" align="center" label="操作" width="100">
+              <template slot-scope="scope">
+                <div class="table-operator"> -->
+            <!-- <el-link type="primary" class="link" @click="collOrganization()">冻结用户</el-link> -->
+            <!-- <el-link type="primary" class="link" @click="untyingUser(scope.row)">解绑用户</el-link> -->
+            <!-- <el-link class="link" type="danger" @click="deleteUser(scope.row.id)">删除</el-link> -->
+            <!-- </div>
+              </template>
+            </el-table-column> -->
+          </el-table>
+          <pagination :metadata="metadata" :table-change="tableChange" />
+        </div>
+      </el-col>
+    </el-row>
+
+    <el-dialog :visible.sync="bindingUsersDialog" title="绑定用户" width="60%">
+      <el-row :gutter="20">
+        <el-col :span="20" :offset="2">
+          <div class="grid-content bg-purple">
+            <el-transfer v-model="value" :data="data" :titles="['未绑定', '已绑定']"/>
+          </div>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click="bindingUsersDialog = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="bindingUsers(value)">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!--
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small"  @click="resetForm('form')">取 消</el-button>
+        <el-button size="small"  type="primary" @click="submitForm('form')">确 定</el-button>
+      </span>
+    </el-dialog>-->
+  </div>
+</template>
+
+<script>
+// import { getOrganization } from '@/api/table';
+import Pagination from '@/components/pagination';
+import { requestParams, parseHash } from '@/utils/urlParam';
+// import { allUserList } from "@/utils/allUser";
+import { getUser, deletedUser, createdUser, deletedALLUser } from '@/api/user';
+import {
+  getOrganizationUser,
+  organizationsBindingUsers,
+  organizationsUntyingUsers
+} from '@/api/organizations';
+
+export default {
+  components: {
+    Pagination
+  },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'gray',
+        deleted: 'danger'
+      };
+      return statusMap[status];
+    },
+    formatTime: function(date, fmt) {
+      var date = new Date(date);
+      if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(
+          RegExp.$1,
+          (date.getFullYear() + '').substr(4 - RegExp.$1.length)
+        );
+      }
+      var o = {
+        'M+': date.getMonth() + 1,
+        'd+': date.getDate(),
+        'h+': date.getHours(),
+        'm+': date.getMinutes(),
+        's+': date.getSeconds()
+      };
+      for (var k in o) {
+        if (new RegExp('(' + k + ')').test(fmt)) {
+          var str = o[k] + '';
+          fmt = fmt.replace(
+            RegExp.$1,
+            RegExp.$1.length === 1 ? str : ('00' + str).substr(str.length)
+          );
+        }
+      }
+      return fmt;
+    }
+  },
+  data() {
+    return {
+      total: null,
+      disabled: true,
+      list: [],
+      data: [],
+      metadata: undefined,
+      search: { page: 1, rows: 10 },
+      patchDeleted: null,
+      listLoading: false,
+      searchInput: '',
+      expandRowKeys: [],
+      dialogVisible: false,
+      dialogFormVisible: false,
+      dialogFormPeizhi: false,
+      bindingUsersDialog: false,
+      user: {
+        sex: '',
+        country: '',
+        credentialsType: '',
+        IDNumber: '',
+
+        credential: {
+          credentialData: '',
+          expireDate: '',
+          expirePolicy: '',
+          resourceLogos: '',
+          resourceType: '',
+          resourceUrn: '',
+          tags: '',
+          type: ''
+        },
+        description: '',
+        headPortrait: '',
+        language: '',
+        logoutPage: '/alice',
+        mainPage: '/index',
+        pageTheme: 'theme',
+        resourceLogos: '',
+        resourceType: '',
+        resourceUrn: '',
+        tags: '',
+        userExtension: {
+          address: '',
+          birthDay: '',
+          email: '',
+          firstName: '',
+          lastName: '',
+          mobilePhone: '',
+          position: '',
+          name: ''
+        },
+        userName: ''
+      },
+      form: {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      },
+      value: [],
+      roleUserDTO: {
+        roleID: 0,
+        userIDs: []
+      }
+    };
+  },
+
+  created() {
+    // this.fetchData();
+    // this.list = allUserList();
+    this.fetchData();
+    this.search = parseHash(this.search);
+  },
+  methods: {
+    async fetchData() {
+      this.listLoading = true;
+      getOrganizationUser(this.search, this.$route.params.id).then(res => {
+        if (res.content != null) {
+          this.metadata = res.metadata;
+          this.list = res.content.content;
+        } else {
+          this.metadata = [];
+          this.list = [];
+        }
+        this.listLoading = false;
+      });
+    },
+    tableChange({ page, rows }) {
+      this.search.page = page;
+      rows && (this.search.rows = rows);
+      this.fetchData();
+    },
+    // 搜索
+    searchUser() {
+      this.search.name = this.searchInput;
+      this.fetchData();
+    },
+    // 删除方法
+    deleteUser(id) {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deletedUser(id).then(r => {
+            if (r.code == 204) {
+              this.fetchData();
+              this.$notify({
+                type: 'success',
+                message: '删除成功!'
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+    },
+    // 批量删除-------有问题
+    deleteALLUser() {
+      const data1 = [];
+      for (var i = 0; i < this.patchDeleted.length; i++) {
+        data1.push(this.patchDeleted[i].id);
+      }
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deletedALLUser(data1).then(r => {
+            if (r.code == 204) {
+              this.fetchData();
+              this.$notify({
+                type: 'success',
+                message: '批量删除成功!'
+              });
+            } else {
+              this.$notify({
+                type: 'info',
+                message: '删除失败，请重试'
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+    },
+    handleSelectionChange(rows) {
+      this.patchDeleted = rows;
+      if (this.patchDeleted.length > 0) {
+        this.disabled = false;
+      } else {
+        this.disabled = true;
+      }
+    },
+    // 新建
+    createUser() {
+      const data = JSON.parse(JSON.stringify(this.user));
+      createdUser(data).then(res => {
+        if (res.code == 201) {
+          this.$notify({
+            message: '新增成功',
+            type: 'success'
+          });
+          this.dialogVisible = false;
+          this.fetchData();
+        } else {
+          this.$notify({
+            message: '新增失败，请重试',
+            type: 'warning'
+          });
+        }
+      });
+    },
+    handleRowClick(row, column, event) {
+      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      const index = this.expandRowKeys.indexOf(row.id);
+      if (index == -1) {
+        this.expandRowKeys.push(row.id);
+      } else {
+        this.expandRowKeys.splice(index, 1);
+      }
+    },
+    handleClick(row) {},
+    // 显示绑定用户模态框
+    clickBindingUser() {
+      this.bindingUsersDialog = true;
+      const data = [];
+      getUser(this.page).then(res => {
+        const list = res.content.content;
+        for (let i = 0; i < list.length; i++) {
+          data.push({
+            key: list[i].id,
+            label: list[i].name
+          });
+        }
+      });
+      this.data = data;
+    },
+    // 绑定用户
+    bindingUsers(value) {
+      this.roleUserDTO.userIDs = value;
+      console.log(this.$route.params.id);
+      organizationsBindingUsers(this.$route.params.id, this.roleUserDTO).then(
+        res => {
+          this.organizationId = '';
+          if (res.code == 201) {
+            this.$notify({
+              message: res.message,
+              type: 'success'
+            });
+            this.bindingUsersDialog = false;
+            this.fetchData();
+          } else {
+            this.$notify({
+              message: res.message,
+              type: 'warning'
+            });
+          }
+        }
+      );
+    },
+    // 解绑用户
+    untyingUser(row) {
+      console.log(row.id);
+      var roleUserDTO = {
+        roleID: 0,
+        userIDs: [row.id]
+      };
+
+      organizationsUntyingUsers(this.$route.params.id, roleUserDTO).then(res => {
+        this.organizationId = '';
+        if (res.code == 201) {
+          this.$notify({
+            message: res.message,
+            type: 'success'
+          });
+
+          this.fetchData();
+        } else {
+          this.$notify({
+            message: res.message,
+            type: 'warning'
+          });
+        }
+      });
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.active{
+  transform:scale(0.9);
+}
+.icon-wrap {
+  float: left;
+  background: #00609e;
+  border-radius: 40px;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  padding-top: 15px;
+  margin-right: 10px;
+
+  .icon {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.txt-wrap {
+  display: inline-block;
+  margin-top: 10px;
+
+  .main-txt {
+    font-weight: bold;
+  }
+
+  .sub-txt {
+    margin-top: 8px;
+  }
+}
+
+.search-input {
+  width: 150px;
+  margin: 0 10px;
+}
+</style>
+<style>
+.el-notification__content {
+  line-height: 12px;
+}
+</style>
