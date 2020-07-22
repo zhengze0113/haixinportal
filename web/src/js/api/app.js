@@ -11,7 +11,7 @@ const baseURL = {
   microservicePath: "http://10.72.78.125:9528",
   workbenchPath: "http://10.72.78.125:9526"
 };
-
+//测试提交
 /**
  * 以下代码本地启动需要注释掉
  */
