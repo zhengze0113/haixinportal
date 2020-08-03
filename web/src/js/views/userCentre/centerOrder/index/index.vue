@@ -638,7 +638,7 @@ export default {
     },
     particulars(data) {
       this.$router.push({
-        path: '/userCentre/centerOrder/detail/' + data.id
+        path: '/userCentre/centerOrder/detail/' + data.id + "/false"
       });
     },
     // 分页
@@ -710,7 +710,7 @@ export default {
 /deep/ .el-tabs__item {
   height: 32px;
   line-height: 32px;
-  font-size: 12px;
+  font-size: 14px;
 }
 /deep/ .el-tabs__header {
   padding: 0;

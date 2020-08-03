@@ -20,7 +20,7 @@
         </el-col>
       </div>
     </el-row>
-    <el-row style="background:#fff">
+    <el-row style="background:#fff;margin-bottom: 16px;">
       <el-col
         :span="3"
         :offset="1"
@@ -29,13 +29,13 @@
         <img
           src="/web/static/images/order.png"
           alt=""
-          style="margin-top:10%;"
+          style="margin-top:33%;"
         />
       </el-col>
-      <el-col :span="18" :offset="1">
+      <el-col :span="18" :offset="1" style="margin: 20px 0px 20px 40px;">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">帐单号：</el-col>
+            <el-col :span="8">帐&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
             <el-col :span="16">{{ info.billNo }}</el-col>
           </el-col>
           <el-col :span="8">
@@ -194,7 +194,7 @@ export default {
   methods: {
     particulars(data) {
       this.$router.push({
-        path: "/tenementCentre/centerOrder/detail/" + data.id
+        path: "/tenementCentre/centerOrder/detail/" + data.id + "/true"
       });
     },
     async initSelect() {},

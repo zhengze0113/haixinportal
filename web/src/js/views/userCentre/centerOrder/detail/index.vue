@@ -35,23 +35,23 @@ text-align: center;"
       <el-col :span="16" :offset="1">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="5">订单号：</el-col>
+            <el-col :span="7">订单号：</el-col>
             <el-col :span="16">{{ lists.sn }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="5">组织信息：</el-col>
+            <el-col :span="7">组织信息：</el-col>
             <el-col :span="16"
               >{{ lists.tenantName }}-{{ lists.organizationName }}</el-col
             >
           </el-col>
           <el-col :span="8">
-            <el-col :span="5">下单时间：</el-col>
+            <el-col :span="7">下单时间：</el-col>
             <el-col :span="16">{{ lists.gmtCreate }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="5">订单状态：</el-col>
+            <el-col :span="7">订单状态：</el-col>
             <el-col :span="16">
               <el-tag :type="lists.statusTxtType" size="small">{{
                 lists.statusName
@@ -59,19 +59,19 @@ text-align: center;"
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="5" style="line-height:22px">所属项目：</el-col>
+            <el-col :span="7" style="line-height:22px">所属项目：</el-col>
             <el-col :span="16">
               {{ lists.projectName }}
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="6" style="line-height:22px">下单人：</el-col>
+            <el-col :span="7" style="line-height:22px">下单人：</el-col>
             <el-col :span="16">{{ lists.userName }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="5" style="line-height:22px">订单类别：</el-col>
+            <el-col :span="7" style="line-height:22px">订单类别：</el-col>
             <el-col :span="16">
               <el-tag :type="lists.orderTypeTxtType" size="small">{{
                 lists.orderTypeName
@@ -242,11 +242,11 @@ import {
   deleteOrders,
   batchDeletedOrder,
   getOrdersInfo,
-  getOrderOperation
+  getOrderOperation,
 } from "@/api/ordersCenter";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   data() {
     return {
@@ -257,7 +257,7 @@ export default {
         number: 1,
         numberOfElements: 10,
         totalElements: 1,
-        totalPages: 1
+        totalPages: 1,
       },
       list1: [],
       countsum: 0,
@@ -271,7 +271,7 @@ export default {
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
               picker.$emit("pick", [start, end]);
-            }
+            },
           },
           {
             text: "最近一个月",
@@ -280,7 +280,7 @@ export default {
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
               picker.$emit("pick", [start, end]);
-            }
+            },
           },
           {
             text: "最近三个月",
@@ -289,13 +289,13 @@ export default {
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
               picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       value1: "",
       value2: "",
-      search: { page: 1, rows: 10 }
+      search: { page: 1, rows: 10 },
     };
   },
   beforeCreate() {
@@ -353,13 +353,13 @@ export default {
           this.lists.orderTypeTxtType = "success";
           break;
       }
-      await userInfo(this.lists.userId).then(res => {
+      await userInfo(this.lists.userId).then((res) => {
         this.lists.userName = res.content.userName;
       });
-      await getTenantInfo(this.lists.tenantId).then(res => {
+      await getTenantInfo(this.lists.tenantId).then((res) => {
         this.lists.tenantName = res.content.name;
       });
-      await getByIdOrganizations(this.lists.orgId).then(res => {
+      await getByIdOrganizations(this.lists.orgId).then((res) => {
         this.lists.organizationName = res.content.name;
       });
       for (var z = 0; z < this.list.length; z++) {
@@ -405,7 +405,7 @@ export default {
     async initSelect() {},
     comeback() {
       this.$router.push({
-        path: "/userCentre/centerOrder"
+        path: "/userCentre/centerOrder",
       });
     },
     tableChange({ page, rows }) {
@@ -414,11 +414,17 @@ export default {
       this.fetchData();
     },
     back() {
-      this.$router.push({
-        path: "/userCentre/centerOrder"
-      }); // 返回上一层
-    }
-  }
+      if (this.$route.params.billHtml == "true") {
+        this.$router.push({
+          path: "/userCentre/userServiceSubscription",
+        }); // 返回上一层
+      } else {
+        this.$router.push({
+          path: "/userCentre/centerOrder",
+        }); // 返回上一层
+      }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -446,6 +452,6 @@ export default {
 /deep/ .el-tabs__item {
   height: 32px;
   line-height: 32px;
-  font-size: 12px;
+  font-size: 14px;
 }
 </style>

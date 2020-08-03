@@ -9,7 +9,7 @@
               v-model="value2"
               :picker-options="pickerOptions"
               size="small"
-              type="datetimerange"
+              type="monthrange"
               align="right"
               style="width:80%"
               value-format="yyyy-MM-dd HH:mm:ss"
@@ -135,7 +135,6 @@
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
                 <el-button
-                  type="primary"
                   size="small"
                   @click="lookDetail(scope.row.id)"
                   >查看</el-button
@@ -201,7 +200,7 @@ export default {
         }
       ],
       value2: "",
-      serverName: "",
+      serverName: "云计算部",
       pickerOptions: "",
       dialogFormVisible: false,
       listLoading: true,

@@ -42,7 +42,7 @@ export default {
     },
     logout() {
       this.$store.dispatch('LogOut').then(() => {
-        location.href = location.protocol + '//' + location.hostname + ':8090/html/login.html';
+        location.href = baseURL.portalPath +  + '/html/login.html';
         // location.reload(); // 为了重新实例化vue-router对象 避免bug
       });
     }

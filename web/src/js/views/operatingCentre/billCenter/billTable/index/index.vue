@@ -9,7 +9,7 @@
               v-model="value2"
               :picker-options="pickerOptions"
               size="small"
-              type="datetimerange"
+              type="monthrange"
               align="right"
               style="width:80%"
               value-format="yyyy-MM-dd HH:mm:ss"
@@ -90,7 +90,7 @@
                   :to="{
                     path:
                       '/operatingCentre/billCenter/billTable/detail/' +
-                      scope.row.id
+                      scope.row.id,
                   }"
                   class="link"
                   >{{ scope.row.billNo }}</router-link
@@ -130,18 +130,15 @@
                 <el-tag :type="scope.row.settlementStatusType" size="small">
                   {{ scope.row.settlementStatus }}
                 </el-tag>
-              </template> </el-table-column
-            >settlementStatus
+              </template>
+            </el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="lookDetail(scope.row.id)"
+                <el-button size="small" @click="lookDetail(scope.row.id)"
                   >查看</el-button
                 >
               </template> </el-table-column
-            >、
+            >
           </el-table>
           <pagination :metadata="metadata" :table-change="tableChange" />
         </div>
@@ -172,14 +169,14 @@ import { getUserInfo } from "@/utils/auth";
 import { getTenantOrganizations } from "@/api/tenant";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
         published: "success",
         draft: "gray",
-        deleted: "danger"
+        deleted: "danger",
       };
       return statusMap[status];
     },
@@ -187,7 +184,7 @@ export default {
       if (status === "PAID") return "已支付";
       if (status === "UNPAID") return "未支付";
       if (status === "PAYING") return "支付中";
-    }
+    },
   },
   data() {
     return {
@@ -197,11 +194,11 @@ export default {
       options: [
         {
           value: "云计算部",
-          label: "云计算部"
-        }
+          label: "云计算部",
+        },
       ],
       value2: "",
-      serverName: "",
+      serverName: "云计算部",
       pickerOptions: "",
       dialogFormVisible: false,
       listLoading: true,
@@ -216,7 +213,7 @@ export default {
       userInfo: null,
       organizationList: [],
       jsonDataTree: [],
-      page: { page: 1, pageSize: 100 }
+      page: { page: 1, pageSize: 100 },
     };
   },
   computed: {},
@@ -242,7 +239,10 @@ export default {
       this.userInfo = JSON.parse(getUserInfo());
       // this.search.userId = this.userInfo.uid;
       this.list = [];
-      const billRes = await requestParams(getOperatingSummaryBills, this.search);
+      const billRes = await requestParams(
+        getOperatingSummaryBills,
+        this.search
+      );
       this.totalAmount = billRes.content.totalAmount;
       this.unsettlementAmount = billRes.content.unsettlementAmount;
       const billList = billRes.content.resources.content;
@@ -279,7 +279,7 @@ export default {
     },
     getTenantOrgan() {
       // 组织机构下拉框
-      getTenantOrganizations(this.userInfo.tenant, this.page).then(res => {
+      getTenantOrganizations(this.userInfo.tenant, this.page).then((res) => {
         const organList = res.content.content;
         console.log(organList);
         this.jsonDataTree = this.transData(
@@ -337,14 +337,14 @@ export default {
           const a = {
             value: array[i].id,
             label: array[i].name,
-            children: []
+            children: [],
           };
           this.bianli(array[i].children, a.children);
           push1.push(a);
         } else {
           const a = {
             value: array[i].id,
-            label: array[i].name
+            label: array[i].name,
           };
           push1.push(a);
         }
@@ -370,7 +370,7 @@ export default {
     },
     lookDetail(id) {
       this.$router.push({
-        path: "/operatingCentre/billCenter/billTable/detail/" + id
+        path: "/operatingCentre/billCenter/billTable/detail/" + id,
       });
     },
     searchBill() {
@@ -393,8 +393,8 @@ export default {
     },
     handleClick(row) {
       console.log(row);
-    }
-  }
+    },
+  },
 };
 </script>
 

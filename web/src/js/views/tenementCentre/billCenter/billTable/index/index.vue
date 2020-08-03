@@ -9,7 +9,7 @@
               v-model="value2"
               :picker-options="pickerOptions"
               size="small"
-              type="datetimerange"
+              type="monthrange"
               align="right"
               style="width:80%"
               value-format="yyyy-MM-dd HH:mm:ss"
@@ -20,21 +20,16 @@
           </el-col>
           <el-col :span="6" :offset="1">
             <span>租户：</span>
-            <el-select
-              v-model="tenementName"
-              size="small"
-              placeholder="请选择"
-              width="80%"
+            <el-cascader
+              ref="trees"
+              :options="organizationList"
+              :props="{ expandTrigger: 'hover', checkStrictly: true }"
+              :show-all-levels="false"
               clearable
-              @change="searcClickServer"
-            >
-              <el-option
-                v-for="item in tenementList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
+              size="mini"
+              placeholder="请选择组织机构"
+              @change="searcClickOrgan"
+            />
           </el-col>
           <el-col :offset="1" :span="7">
             <span>服务方：</span>
@@ -64,9 +59,7 @@
             <el-row class="card-title">
               <el-tag size="medium" class="boder">账单总金额</el-tag>
             </el-row>
-            <el-row class="price">
-              ￥{{totalAmount}}
-            </el-row>
+            <el-row class="price"> ￥{{ totalAmount }} </el-row>
           </el-col>
           <el-col class="left-card">
             <el-row class="card-title">
@@ -74,9 +67,7 @@
                 >未结算金额</el-tag
               >
             </el-row>
-            <el-row class="price">
-              ￥{{unsettlementAmount}}
-            </el-row>
+            <el-row class="price"> ￥{{ unsettlementAmount }} </el-row>
           </el-col>
         </el-row>
       </el-col>
@@ -99,7 +90,7 @@
                   :to="{
                     path:
                       '/tenementCentre/billCenter/billTable/detail/' +
-                      scope.row.id
+                      scope.row.id,
                   }"
                   class="link"
                   >{{ scope.row.billNo }}</router-link
@@ -144,7 +135,6 @@
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
                 <el-button
-                  type="primary"
                   size="small"
                   @click="lookDetail(scope.row.id)"
                   >查看</el-button
@@ -176,19 +166,19 @@
 import Pagination from "@/components/pagination";
 import { requestParams, parseHash } from "@/utils/urlParam";
 import { getBillsList } from "@/api/ordersCenter";
-import { getTenantSummaryBills} from "@/api/billApi";
+import { getTenantSummaryBills } from "@/api/billApi";
 import { getUserInfo } from "@/utils/auth";
 import { getTenantOrganizations } from "@/api/tenant";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
         published: "success",
         draft: "gray",
-        deleted: "danger"
+        deleted: "danger",
       };
       return statusMap[status];
     },
@@ -196,7 +186,7 @@ export default {
       if (status === "PAID") return "已支付";
       if (status === "UNPAID") return "未支付";
       if (status === "PAYING") return "支付中";
-    }
+    },
   },
   data() {
     return {
@@ -206,13 +196,13 @@ export default {
       options: [
         {
           value: "云计算部",
-          label: "云计算部"
-        }
+          label: "云计算部",
+        },
       ],
       tenementName: "",
       tenementList: "",
       value2: "",
-      serverName: "",
+      serverName: "云计算部",
       pickerOptions: "",
       dialogFormVisible: false,
       listLoading: true,
@@ -227,7 +217,7 @@ export default {
       userInfo: null,
       organizationList: [],
       jsonDataTree: [],
-      page: { page: 1, pageSize: 100 }
+      page: { page: 1, pageSize: 100 },
     };
   },
   computed: {},
@@ -294,7 +284,7 @@ export default {
     },
     getTenantOrgan() {
       // 组织机构下拉框
-      getTenantOrganizations(this.userInfo.tenant, this.page).then(res => {
+      getTenantOrganizations(this.userInfo.tenant, this.page).then((res) => {
         const organList = res.content.content;
         console.log(organList);
         this.jsonDataTree = this.transData(
@@ -352,14 +342,14 @@ export default {
           const a = {
             value: array[i].id,
             label: array[i].name,
-            children: []
+            children: [],
           };
           this.bianli(array[i].children, a.children);
           push1.push(a);
         } else {
           const a = {
             value: array[i].id,
-            label: array[i].name
+            label: array[i].name,
           };
           push1.push(a);
         }
@@ -385,7 +375,7 @@ export default {
     },
     lookDetail(id) {
       this.$router.push({
-        path: "/tenementCentre/billCenter/billTable/detail/" + id
+        path: "/tenementCentre/billCenter/billTable/detail/" + id,
       });
     },
     searchBill() {
@@ -408,8 +398,8 @@ export default {
     },
     handleClick(row) {
       console.log(row);
-    }
-  }
+    },
+  },
 };
 </script>
 

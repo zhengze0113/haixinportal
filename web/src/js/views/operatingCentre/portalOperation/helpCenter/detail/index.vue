@@ -306,6 +306,6 @@ export default {
 /deep/ .el-tabs__item {
   height: 32px;
   line-height: 32px;
-  font-size: 12px;
+  font-size: 14px;
 }
 </style>
