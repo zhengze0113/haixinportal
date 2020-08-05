@@ -35,23 +35,23 @@ text-align: center;"
       <el-col :span="16" :offset="1">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="7">订单号：</el-col>
+            <el-col :span="8">订&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
             <el-col :span="16" class="xqColor">{{ lists.sn }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="7">组织信息：</el-col>
+            <el-col :span="8">组织信息：</el-col>
             <el-col :span="16" class="xqColor"
               >{{ lists.tenantName }}-{{ lists.organizationName }}</el-col
             >
           </el-col>
           <el-col :span="8">
-            <el-col :span="7">下单时间：</el-col>
+            <el-col :span="8">下单时间：</el-col>
             <el-col :span="16" class="xqColor">{{ lists.gmtCreate }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="7">订单状态：</el-col>
+            <el-col :span="8">订单状态：</el-col>
             <el-col :span="16">
               <el-tag
                 :type="lists.statusTxtType"
@@ -62,19 +62,19 @@ text-align: center;"
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="7" style="line-height:22px">所属项目：</el-col>
+            <el-col :span="8" style="line-height:22px">所属项目：</el-col>
             <el-col :span="16" class="xqColor">
               {{ lists.projectName }}
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="7" style="line-height:22px">下单人：</el-col>
+            <el-col :span="8" style="line-height:22px">下单人：</el-col>
             <el-col :span="16" class="xqColor">{{ lists.userName }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="7" style="line-height:22px">订单类别：</el-col>
+            <el-col :span="8" style="line-height:22px">订单类别：</el-col>
             <el-col :span="16" class="xqColor">
               <el-tag :type="lists.orderTypeTxtType" size="small">{{
                 lists.orderTypeName

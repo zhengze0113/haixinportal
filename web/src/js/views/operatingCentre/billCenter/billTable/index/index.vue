@@ -137,8 +137,8 @@
                 <el-button size="small" @click="lookDetail(scope.row.id)"
                   >查看</el-button
                 >
-              </template> </el-table-column
-            >
+              </template>
+            </el-table-column>
           </el-table>
           <pagination :metadata="metadata" :table-change="tableChange" />
         </div>
@@ -199,7 +199,11 @@ export default {
       ],
       value2: "",
       serverName: "云计算部",
-      pickerOptions: "",
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       dialogFormVisible: false,
       listLoading: true,
       searchInput: "",

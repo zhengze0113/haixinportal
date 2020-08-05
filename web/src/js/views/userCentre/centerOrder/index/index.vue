@@ -84,7 +84,7 @@
           <template slot-scope="scope">
             <router-link
               :to="{
-                path: '/userCentre/centerOrder/detail/' + scope.row.id
+                path: '/userCentre/centerOrder/detail/' + scope.row.id + '/false'
               }"
               class="link"
             >
@@ -638,7 +638,7 @@ export default {
     },
     particulars(data) {
       this.$router.push({
-        path: '/userCentre/centerOrder/detail/' + data.id + "/false"
+        path: '/userCentre/centerOrder/detail/' + data.id + '/false'
       });
     },
     // 分页

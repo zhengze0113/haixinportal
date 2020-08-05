@@ -201,7 +201,11 @@ export default {
       ],
       value2: "",
       serverName: "云计算部",
-      pickerOptions: "",
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       dialogFormVisible: false,
       listLoading: true,
       searchInput: "",

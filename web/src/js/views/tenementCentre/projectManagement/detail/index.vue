@@ -21,24 +21,24 @@
     <el-row
       style="padding:15px 22px;;background:#fff; border-bottom: 1px solid rgb(230, 230, 230);"
     >
-      <el-col :span="24" style="margin-top:7px;font-size: 12px;">
+      <el-col :span="24" style="margin-top:7px;font-size: 14px;">
         <el-col :span="8">
           <el-col :span="6">项目组名称：</el-col>
-          <el-col :span="16">{{ info.projectName }}</el-col>
+          <el-col :span="16"class="xqColor">{{ info.projectName }}</el-col>
         </el-col>
         <el-col :span="8">
           <el-col :span="5">归属组织：</el-col>
-          <el-col :span="16">{{ info.deptName }}</el-col>
+          <el-col :span="16"class="xqColor">{{ info.deptName }}</el-col>
         </el-col>
       </el-col>
-      <el-col :span="24" style="margin-top:7px;font-size: 12px;">
+      <el-col :span="24" style="margin-top:7px;font-size: 14px;">
         <el-col :span="8">
           <el-col :span="6">创建时间：</el-col>
-          <el-col :span="16">{{ info.gmtCreate | formatTime('yyyy-MM-dd hh:mm:ss') }}</el-col>
+          <el-col :span="16"class="xqColor">{{ info.gmtCreate | formatTime('yyyy-MM-dd hh:mm:ss') }}</el-col>
         </el-col>
         <el-col :span="8">
           <el-col :span="5">描述：</el-col>
-          <el-col :span="16">{{ info.description }}</el-col>
+          <el-col :span="16"class="xqColor">{{ info.description }}</el-col>
         </el-col>
       </el-col>
     </el-row>
@@ -828,5 +828,8 @@ export default {
   height: 32px;
   line-height: 32px;
   font-size: 14px;
+}
+.xqColor{
+  color: #666;
 }
 </style>

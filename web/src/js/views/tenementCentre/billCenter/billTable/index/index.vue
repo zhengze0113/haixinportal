@@ -134,9 +134,7 @@
             >settlementStatus
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  size="small"
-                  @click="lookDetail(scope.row.id)"
+                <el-button size="small" @click="lookDetail(scope.row.id)"
                   >查看</el-button
                 >
               </template> </el-table-column
@@ -203,7 +201,11 @@ export default {
       tenementList: "",
       value2: "",
       serverName: "云计算部",
-      pickerOptions: "",
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       dialogFormVisible: false,
       listLoading: true,
       searchInput: "",

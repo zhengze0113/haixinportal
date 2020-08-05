@@ -84,7 +84,7 @@
           <template slot-scope="scope">
             <router-link
               :to="{
-                path: '/tenementCentre/centerOrder/detail/' + scope.row.id
+                path: '/tenementCentre/centerOrder/detail/' + scope.row.id+ '/false'
               }"
               class="link"
             >

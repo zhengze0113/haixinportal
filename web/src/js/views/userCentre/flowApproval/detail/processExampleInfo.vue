@@ -28,28 +28,28 @@ text-align: center;">
       <el-col :span="16" :offset="1">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="5">订单号：</el-col>
-            <el-col :span="16">{{ info.sn }}</el-col>
+            <el-col :span="8">订&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
+            <el-col :span="16" class="xqColor">{{ info.sn }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="5">下单时间：</el-col>
-            <el-col :span="16">{{ info.gmtModify }}</el-col>
+            <el-col :span="8">下单时间：</el-col>
+            <el-col :span="16" class="xqColor">{{ info.gmtModify }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="5">组织信息：</el-col>
-            <el-col :span="16">{{ info.tenantName }}-{{ info.organizationName }}</el-col>
+            <el-col :span="8">组织信息：</el-col>
+            <el-col :span="16" class="xqColor">{{ info.tenantName }}-{{ info.organizationName }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="5">订单状态：</el-col>
+            <el-col :span="8">订单状态：</el-col>
             <el-col :span="16">
               <el-tag :type="info.statusTxtType" size="small">{{ info.statusName }}</el-tag>
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="6">下单人：</el-col>
-            <el-col :span="16">{{ info.userName }}</el-col>
+            <el-col :span="8">下&nbsp;&nbsp;单&nbsp;&nbsp;人：</el-col>
+            <el-col :span="16" class="xqColor">{{ info.userName }}</el-col>
           </el-col>
         </el-col>
       </el-col>
@@ -276,5 +276,8 @@ export default {
   font-size: 16px;
   color: #333;
   font-weight: bold;
+}
+.xqColor{
+  color: #666;
 }
 </style>
