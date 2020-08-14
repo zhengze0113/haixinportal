@@ -52,8 +52,26 @@
         </el-row>
       </div>
     </el-row>
-    <el-row :gutter="20" style="margin-top:20px;padding-right:10px">
-      <el-col :span="4" style="padding-right:20px;">
+    <el-row  style="margin-top:20px;">
+      <el-col v-if="width1280">
+        <el-row>
+          <el-col :span="12" class="left-card1">
+            <el-row  style="text-align: center;padding: 20px 20px;">
+              <el-tag size="medium" class="boder">账单总金额</el-tag>
+            </el-row>
+            <el-row class="price" style="text-align: center;padding: 20px 20px 20px;"> ￥{{ totalAmount }} </el-row>
+          </el-col>
+          <el-col :span="12" style="padding-left:10px">
+            <el-row style=" background: #fff;padding: 20px 20px;text-align: center;">
+              <el-tag size="medium" class="boder" type="danger" 
+                >未结算金额</el-tag
+              >
+            </el-row>
+            <el-row class="price" style=" background: #fff;text-align: center;padding: 20px 20px 20px;"> ￥{{ unsettlementAmount }} </el-row>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-col v-if="!width1280" :span="4" style="padding-right:20px;">
         <el-row>
           <el-col class="left-card">
             <el-row class="card-title">
@@ -71,7 +89,7 @@
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="20" class="table-css">
+      <el-col v-if="width1280" :span="24" class="table-css" style="margin-top:10px">
         <div class="grid-content bg-purple">
           <el-table
             v-loading="listLoading"
@@ -90,7 +108,7 @@
                   :to="{
                     path:
                       '/userCentre/userServiceSubscription/detail/' +
-                      scope.row.id
+                      scope.row.id,
                   }"
                   class="link"
                   >{{ scope.row.billNo }}</router-link
@@ -134,9 +152,79 @@
             >settlementStatus
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  size="small"
-                  @click="lookDetail(scope.row.id)"
+                <el-button size="small" @click="lookDetail(scope.row.id)"
+                  >查看</el-button
+                >
+              </template> </el-table-column
+            >、
+          </el-table>
+          <pagination :metadata="metadata" :table-change="tableChange" />
+        </div>
+      </el-col>
+      <el-col v-if="!width1280" :span="20" class="table-css">
+        <div class="grid-content bg-purple">
+          <el-table
+            v-loading="listLoading"
+            :data="list"
+            :expand-row-keys="expandRowKeys"
+            size="small"
+            element-loading-text="Loading"
+            fit
+            highlight-current-row
+            row-key="id"
+            @row-click="handleRowClick"
+          >
+            <el-table-column label="账单号" align="center">
+              <template slot-scope="scope">
+                <router-link
+                  :to="{
+                    path:
+                      '/userCentre/userServiceSubscription/detail/' +
+                      scope.row.id,
+                  }"
+                  class="link"
+                  >{{ scope.row.billNo }}</router-link
+                >
+              </template>
+            </el-table-column>
+            <el-table-column label="结算周期" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.billStart }}-{{ scope.row.billStop }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算对象" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.tenantName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算方式" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.payModeType" size="small">
+                  {{ scope.row.payMode }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单数量" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.orderQuantity }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算金额（￥）" align="center">
+              <template slot-scope="scope">{{
+                scope.row.settlementAmount
+              }}</template>
+            </el-table-column>
+
+            <el-table-column label="结算状态" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.settlementStatusType" size="small">
+                  {{ scope.row.settlementStatus }}
+                </el-tag>
+              </template> </el-table-column
+            >settlementStatus
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <el-button size="small" @click="lookDetail(scope.row.id)"
                   >查看</el-button
                 >
               </template> </el-table-column
@@ -146,20 +234,6 @@
         </div>
       </el-col>
     </el-row>
-    <el-dialog :visible.sync="dialogFormVisible" title="新建">
-      字段信息（表单）
-      <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogFormVisible = false"
-          >取 消</el-button
-        >
-        <el-button
-          type="primary"
-          size="small"
-          @click="dialogFormVisible = false"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -171,14 +245,14 @@ import { getUserInfo } from "@/utils/auth";
 import { getTenantOrganizations } from "@/api/tenant";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
         published: "success",
         draft: "gray",
-        deleted: "danger"
+        deleted: "danger",
       };
       return statusMap[status];
     },
@@ -186,18 +260,19 @@ export default {
       if (status === "PAID") return "已支付";
       if (status === "UNPAID") return "未支付";
       if (status === "PAYING") return "支付中";
-    }
+    },
   },
   data() {
     return {
+      width1280: false,
       totalAmount: 0,
       unsettlementAmount: 0,
       list: [],
       options: [
         {
           value: "云计算部",
-          label: "云计算部"
-        }
+          label: "云计算部",
+        },
       ],
       value2: "",
       serverName: "云计算部",
@@ -219,11 +294,16 @@ export default {
       userInfo: null,
       organizationList: [],
       jsonDataTree: [],
-      page: { page: 1, pageSize: 100 }
+      page: { page: 1, pageSize: 100 },
     };
   },
   computed: {},
   created() {
+    if (window.screen.width <= 1280) {
+      this.width1280 = true;
+    }
+    console.log(window.screen.width)
+    console.log(this.width1280)
     this.fetchData();
     this.getTenantOrgan();
     // this.getSummaryOverviews();
@@ -282,7 +362,7 @@ export default {
     },
     getTenantOrgan() {
       // 组织机构下拉框
-      getTenantOrganizations(this.userInfo.tenant, this.page).then(res => {
+      getTenantOrganizations(this.userInfo.tenant, this.page).then((res) => {
         const organList = res.content.content;
         console.log(organList);
         this.jsonDataTree = this.transData(
@@ -340,14 +420,14 @@ export default {
           const a = {
             value: array[i].id,
             label: array[i].name,
-            children: []
+            children: [],
           };
           this.bianli(array[i].children, a.children);
           push1.push(a);
         } else {
           const a = {
             value: array[i].id,
-            label: array[i].name
+            label: array[i].name,
           };
           push1.push(a);
         }
@@ -373,7 +453,7 @@ export default {
     },
     lookDetail(id) {
       this.$router.push({
-        path: "/userCentre/userServiceSubscription/detail/" + id
+        path: "/userCentre/userServiceSubscription/detail/" + id,
       });
     },
     searchBill() {
@@ -396,8 +476,8 @@ export default {
     },
     handleClick(row) {
       console.log(row);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -447,6 +527,10 @@ export default {
   &:last-child {
     margin-top: 20px;
   }
+}
+.left-card1 {
+  background: #fff;
+
 }
 .el-table--fit {
   border: 0px solid #ebeef5;

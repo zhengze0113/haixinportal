@@ -135,6 +135,7 @@
                 <el-link
                   class="link"
                   type="primary"
+                  disabled
                   @click="update(scope.row)"
                 >编辑</el-link
                 >

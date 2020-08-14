@@ -174,7 +174,6 @@
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
             <el-button
-              type="text"
               size="small"
               @click.stop="particulars(scope.row)"
             >查看</el-button

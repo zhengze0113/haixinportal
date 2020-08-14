@@ -13,7 +13,7 @@
             size="xx-small"
             icon="el-icon-back"
             @click="back"
-          >返回</el-button
+            >返回</el-button
           >
         </div>
       </div>
@@ -23,22 +23,24 @@
     >
       <el-col :span="24" style="margin-top:7px;font-size: 14px;">
         <el-col :span="8">
-          <el-col :span="6">项目组名称：</el-col>
-          <el-col :span="16"class="xqColor">{{ info.projectName }}</el-col>
+          <el-col :span="6" class="xqColor">项目组名称：</el-col>
+          <el-col :span="16">{{ info.projectName }}</el-col>
         </el-col>
         <el-col :span="8">
-          <el-col :span="5">归属组织：</el-col>
-          <el-col :span="16"class="xqColor">{{ info.deptName }}</el-col>
+          <el-col :span="5" class="xqColor">归属组织：</el-col>
+          <el-col :span="16">{{ info.deptName }}</el-col>
         </el-col>
       </el-col>
       <el-col :span="24" style="margin-top:7px;font-size: 14px;">
         <el-col :span="8">
-          <el-col :span="6">创建时间：</el-col>
-          <el-col :span="16"class="xqColor">{{ info.gmtCreate | formatTime('yyyy-MM-dd hh:mm:ss') }}</el-col>
+          <el-col :span="6" class="xqColor">创建时间：</el-col>
+          <el-col :span="16">{{
+            info.gmtCreate | formatTime("yyyy-MM-dd hh:mm:ss")
+          }}</el-col>
         </el-col>
         <el-col :span="8">
-          <el-col :span="5">描述：</el-col>
-          <el-col :span="16"class="xqColor">{{ info.description }}</el-col>
+          <el-col :span="5" class="xqColor">描述：</el-col>
+          <el-col :span="16">{{ info.description }}</el-col>
         </el-col>
       </el-col>
     </el-row>
@@ -53,20 +55,14 @@
           <el-row>
             <el-col :span="16">
               <div class="left">
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="addprojectUser()"
-                >添加成员</el-button
+                <el-button type="primary" size="small" @click="addprojectUser()"
+                  >添加成员</el-button
                 >
               </div>
             </el-col>
             <el-col :span="8">
-              <el-col
-                :span="5"
-                style="line-height:32px"
-                class="right"
-              >成员名称:</el-col
+              <el-col :span="5" style="line-height:32px" class="right"
+                >成员名称:</el-col
               >
               <el-col :span="13">
                 <el-input
@@ -83,7 +79,7 @@
                   icon="el-icon-search"
                   type="primary"
                   @click="searchUserName()"
-                >查询</el-button
+                  >查询</el-button
                 >
               </el-col>
             </el-col>
@@ -124,9 +120,7 @@
                       show-overflow-tooltip
                     >
                       <template slot-scope="scope">
-                        <span>{{
-                          scope.row.deptName
-                        }}</span>
+                        <span>{{ scope.row.deptName }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -135,9 +129,7 @@
                       show-overflow-tooltip
                     >
                       <template slot-scope="scope">
-                        <span>{{
-                          scope.row.userExtension.sex
-                        }}</span>
+                        <span>{{ scope.row.userExtension.sex }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="联系方式" align="center">
@@ -148,18 +140,24 @@
                     <el-table-column label="加入项目时间" align="center">
                       <template slot-scope="scope">
                         <span>{{
-                          scope.row.createTime | formatTime('yyyy-MM-dd hh:mm:ss')
+                          scope.row.createTime
+                            | formatTime("yyyy-MM-dd hh:mm:ss")
                         }}</span>
                       </template>
                     </el-table-column>
 
                     <el-table-column label="操作" align="center">
                       <template slot-scope="scope">
-                        <el-button type="text" @click="deleteUser(scope.row.id)">删除</el-button>
+                        <el-button type="text" @click="deleteUser(scope.row.id)"
+                          >删除</el-button
+                        >
                       </template>
                     </el-table-column>
                   </el-table>
-                  <pagination :metadata="metadataUser" :table-change="tableChangeUser" />
+                  <pagination
+                    :metadata="metadataUser"
+                    :table-change="tableChangeUser"
+                  />
                 </div>
               </div>
             </el-col>
@@ -179,29 +177,28 @@
               </div>
             </el-col> -->
             <el-col :span="6">
-              <el-col
-                :span="4"
-                style="line-height:32px"
-                class="right"
-              >集群:</el-col
+              <el-col :span="4" style="line-height:32px" class="right"
+                >集群:</el-col
               >
               <el-col :span="12">
-                <el-select v-model="selectValue" size="mini" placeholder="请选择" @change="searchResourceName()">
+                <el-select
+                  v-model="selectValue"
+                  size="mini"
+                  placeholder="请选择"
+                  @change="searchResourceName()"
+                >
                   <el-option
                     v-for="item in options"
                     :key="item.value"
                     :label="item.label"
-                    :value="item.value"/>
+                    :value="item.value"
+                  />
                 </el-select>
               </el-col>
             </el-col>
             <el-col :span="18">
-              <el-col
-                :xl="2"
-                :lg="4"
-                style="line-height:32px;"
-                class="right"
-              >资源空间名称:</el-col
+              <el-col :xl="2" :lg="4" style="line-height:32px;" class="right"
+                >资源空间名称:</el-col
               >
               <el-col :span="5">
                 <el-input
@@ -218,7 +215,7 @@
                   icon="el-icon-search"
                   type="primary"
                   @click="searchResourceName()"
-                >查询</el-button
+                  >查询</el-button
                 >
               </el-col>
             </el-col>
@@ -252,7 +249,7 @@
                       align="left"
                     >
                       <template slot-scope="scope">
-                        <span v-html="scope.row.resourceCapacity"/>
+                        <span v-html="scope.row.resourceCapacity" />
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -293,7 +290,10 @@
                       }}</template>
                     </el-table-column>
                   </el-table>
-                  <pagination :metadata="metadataResource" :table-change="tableChangeResource" />
+                  <pagination
+                    :metadata="metadataResource"
+                    :table-change="tableChangeResource"
+                  />
                 </div>
               </div>
             </el-col>
@@ -319,7 +319,7 @@
             :button-texts="buttonTexts"
             :format="{
               noChecked: '${total}',
-              hasChecked: '${checked}/${total}'
+              hasChecked: '${checked}/${total}',
             }"
             :data="data"
             style="text-align: left; display: inline-block"
@@ -327,17 +327,21 @@
             @middleValueChange="middleValueChange"
             @change="handleChange"
           >
-            <span
-              slot-scope="{ option }"
-            >{{ option.label }}</span
-            >
+            <span slot-scope="{ option }">{{ option.label }}</span>
           </start>
         </div>
 
         <el-form-item
           style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
         >
-          <el-button type="primary" @click="addUser();addSpecification = false">保存</el-button>
+          <el-button
+            type="primary"
+            @click="
+              addUser();
+              addSpecification = false;
+            "
+            >保存</el-button
+          >
           <el-button @click="addSpecification = false">取消</el-button>
         </el-form-item>
       </el-form>
@@ -362,13 +366,15 @@
                 size="small"
                 @selection-change="handleSelectionChange"
               >
-                <el-table-column type="selection"/>
+                <el-table-column type="selection" />
                 <el-table-column
                   :show-overflow-tooltip="true"
                   label="资源空间名称"
                   align="center"
                 >
-                  <template slot-scope="scope">{{ scope.row.resourceName }}</template>
+                  <template slot-scope="scope">{{
+                    scope.row.resourceName
+                  }}</template>
                 </el-table-column>
                 <el-table-column
                   :show-overflow-tooltip="true"
@@ -384,22 +390,36 @@
                   label="规格"
                   align="center"
                 >
-                  <template slot-scope="scope">{{ scope.row.resourceCapacity }}</template>
+                  <template slot-scope="scope">{{
+                    scope.row.resourceCapacity
+                  }}</template>
                 </el-table-column>
                 <el-table-column
                   :show-overflow-tooltip="true"
                   label="描述"
                   align="center"
                 >
-                  <template slot-scope="scope">{{ scope.row.description }}</template>
+                  <template slot-scope="scope">{{
+                    scope.row.description
+                  }}</template>
                 </el-table-column>
               </el-table>
             </div>
           </div>
         </el-col>
-        <el-form-item style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;">
-          <el-button type="text" style="float:left" @click="addProject()"><i class="el-icon-upload el-icon-circle-plus-outline" style="margin-right:5px"/>创建资源空间</el-button>
-          <pagination :metadata="addResourceMetadata" :table-change="tableChangeaddResource" />
+        <el-form-item
+          style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
+        >
+          <el-button type="text" style="float:left" @click="addProject()"
+            ><i
+              class="el-icon-upload el-icon-circle-plus-outline"
+              style="margin-right:5px"
+            />创建资源空间</el-button
+          >
+          <pagination
+            :metadata="addResourceMetadata"
+            :table-change="tableChangeaddResource"
+          />
           <el-button type="primary" @click="addResources()">保存</el-button>
           <el-button @click="addResourceSpace = false">取消</el-button>
         </el-form-item>
@@ -408,21 +428,27 @@
   </div>
 </template>
 <script>
-import Pagination from '@/components/pagination';
-import { requestParams, parseHash } from '@/utils/urlParam';
-import { getUser } from '@/api/user';
+import Pagination from "@/components/pagination";
+import { requestParams, parseHash } from "@/utils/urlParam";
+import { getUser } from "@/api/user";
+import { getTenantUsers } from "@/api/tenant";
+import { getUserInfo } from "@/utils/auth";
 import {
-  getTenantUsers
-} from '@/api/tenant';
-import {
-  getUserInfo
-} from '@/utils/auth';
-import { getProjectInfo, getProjectUser, addProjectUser, deleteProjectUser, getProjectResource, addProjectResource, getClusters, getClusterNameSpaces } from '@/api/projectManage';
-import Start from '../components/test';
+  getProjectInfo,
+  getProjectUser,
+  addProjectUser,
+  deleteProjectUser,
+  getProjectResource,
+  addProjectResource,
+  getClusters,
+  getClusterNameSpaces,
+} from "@/api/projectManage";
+import Start from "../components/test";
+import baseURL from "@/api/app";
 export default {
   components: {
     Pagination,
-    start: Start
+    start: Start,
   },
   filters: {
     formatTime: function(date, fmt) {
@@ -430,39 +456,39 @@ export default {
       if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(
           RegExp.$1,
-          (date.getFullYear() + '').substr(4 - RegExp.$1.length)
+          (date.getFullYear() + "").substr(4 - RegExp.$1.length)
         );
       }
       var o = {
-        'M+': date.getMonth() + 1,
-        'd+': date.getDate(),
-        'h+': date.getHours(),
-        'm+': date.getMinutes(),
-        's+': date.getSeconds()
+        "M+": date.getMonth() + 1,
+        "d+": date.getDate(),
+        "h+": date.getHours(),
+        "m+": date.getMinutes(),
+        "s+": date.getSeconds(),
       };
       for (var k in o) {
-        if (new RegExp('(' + k + ')').test(fmt)) {
-          var str = o[k] + '';
+        if (new RegExp("(" + k + ")").test(fmt)) {
+          var str = o[k] + "";
           fmt = fmt.replace(
             RegExp.$1,
-            RegExp.$1.length === 1 ? str : ('00' + str).substr(str.length)
+            RegExp.$1.length === 1 ? str : ("00" + str).substr(str.length)
           );
         }
       }
       return fmt;
-    }
+    },
   },
   data() {
     return {
       options: [],
-      selectValue: '',
+      selectValue: "",
       info: {},
       searchUser: { page: 1, pageSize: 10 },
       searchaddUser: { page: 1, pageSize: 999 },
       searchaddResource: { page: 1, rows: 10 },
       searchResource: { page: 1, rows: 10 },
-      searchUserInput: '',
-      searchResourceInput: '',
+      searchUserInput: "",
+      searchResourceInput: "",
       data: [],
       value: [],
       filterMethod(query, item) {
@@ -474,38 +500,37 @@ export default {
       metadataaddUser: null,
       metadataResource: null,
       addResourceMetadata: null,
-      activeName: 'first',
+      activeName: "first",
       userListFrom: [],
       addResourceLoading: false,
       list: [],
       lists: {},
-      list1: [
-      ],
+      list1: [],
       rules: {
-        name: [{ required: true, message: '请输入规格名称', trigger: 'blur' }]
+        name: [{ required: true, message: "请输入规格名称", trigger: "blur" }],
       },
       skuParameter: {
         CPU: 0,
-        code: '',
+        code: "",
         memory: 0,
         storage: 0,
-        keyword: '',
+        keyword: "",
         catalogId: 0,
-        description: '',
-        icon: '',
+        description: "",
+        icon: "",
         initStock: 0,
-        name: '',
+        name: "",
         orgId: 0,
         price: {},
-        resourceId: '',
-        serviceId: '',
-        specContent: '',
+        resourceId: "",
+        serviceId: "",
+        specContent: "",
         specs: [],
-        status: '',
+        status: "",
         stock: 0,
-        tags: '',
+        tags: "",
         tenantId: 0,
-        userId: 0
+        userId: 0,
       },
       middleValue: [],
       rightValue: [],
@@ -514,8 +539,8 @@ export default {
       middleDefaultChecked: [5, 6],
       rightDefaultChecked: [1],
       userInfo: null,
-      titles: ['选择用户', '项目人员', '项目经理'],
-      buttonTexts: ['', '', '', ''],
+      titles: ["选择用户", "项目人员", "项目经理"],
+      buttonTexts: ["", "", "", ""],
       // value4: [1],
       renderFunc(h, option) {
         return (
@@ -525,7 +550,7 @@ export default {
         );
       },
       addList: [],
-      resourceList: []
+      resourceList: [],
     };
   },
   created() {
@@ -546,7 +571,7 @@ export default {
       await this.getgetCluster();
       await this.searchResourceName();
       const tenantSearch = { page: 1, pageSize: 999 };
-      await getTenantUsers(this.userInfo.tenant, tenantSearch).then(res => {
+      await getTenantUsers(this.userInfo.tenant, tenantSearch).then((res) => {
         const userList = res.content.content;
         for (let j = 0; j < this.list.length; j++) {
           for (let i = 0; i < userList.length; i++) {
@@ -558,7 +583,7 @@ export default {
         for (let i = 0; i < userList.length; i++) {
           this.data.push({
             key: userList[i].id,
-            label: userList[i].name
+            label: userList[i].name,
           });
         }
       });
@@ -568,12 +593,12 @@ export default {
         if (rowIndex % 2 === 0) {
           return {
             rowspan: 2,
-            colspan: 1
+            colspan: 1,
           };
         } else {
           return {
             rowspan: 0,
-            colspan: 0
+            colspan: 0,
           };
         }
       }
@@ -582,7 +607,7 @@ export default {
       this.userListFrom = [];
       const userListFrom = [];
       this.searchUser.name = this.searchUserInput;
-      getProjectUser(this.$route.params.id, this.searchUser).then(res => {
+      getProjectUser(this.$route.params.id, this.searchUser).then((res) => {
         this.list = res.content.content;
         this.metadataUser = res.metadata;
         for (let i = 0; i < this.list.length; i++) {
@@ -608,8 +633,8 @@ export default {
                   userListFrom.push(arr);
                 }
               } else {
-                this.list[i].userRole = '';
-                this.list[i].deptName = '';
+                this.list[i].userRole = "";
+                this.list[i].deptName = "";
                 userListFrom.push(this.list[i]);
               }
             }
@@ -620,10 +645,13 @@ export default {
     },
     // 获取集群下拉框
     async getgetCluster() {
-      await getClusters().then(res => {
+      await getClusters().then((res) => {
         this.selectValue = res.content.content[0].id;
         for (let i = 0; i < res.content.content.length; i++) {
-          const arr = { label: res.content.content[i].name, value: res.content.content[i].id };
+          const arr = {
+            label: res.content.content[i].name,
+            value: res.content.content[i].id,
+          };
           this.options.push(arr);
         }
       });
@@ -633,7 +661,7 @@ export default {
       this.searchResource.envId = this.selectValue;
       this.searchResource.name = this.searchResourceInput;
       this.searchResource.projectNo = this.info.projectNo;
-      await getClusterNameSpaces(this.searchResource).then(res => {
+      await getClusterNameSpaces(this.searchResource).then((res) => {
         this.resourceList = res.content;
         this.metadataResource = res.metadata;
       });
@@ -650,9 +678,11 @@ export default {
     // 添加
     async addprojectUser() {
       this.addList = [];
-      await getProjectUser(this.$route.params.id, this.searchaddUser).then(res => {
-        this.list = res.content.content;
-      });
+      await getProjectUser(this.$route.params.id, this.searchaddUser).then(
+        (res) => {
+          this.list = res.content.content;
+        }
+      );
       this.addSpecification = true;
     },
     async addUser() {
@@ -664,28 +694,28 @@ export default {
           }
           data.push({
             id: this.middleValue[j],
-            type: ''
+            type: "",
           });
         }
       }
       for (let i = 0; i < this.addList.length; i++) {
         data.push({
           id: this.addList[i],
-          type: 'ROLE_MANAGER'
+          type: "ROLE_MANAGER",
         });
       }
       // const res = await requestParams(addProjectUser, this.$route.params.id, data);
-      await addProjectUser(this.$route.params.id, data).then(r => {
+      await addProjectUser(this.$route.params.id, data).then((r) => {
         if (r.code == 200) {
           this.fetchData();
           this.$notify({
-            type: 'success',
-            message: r.message
+            type: "success",
+            message: r.message,
           });
         } else {
           this.$notify({
-            type: 'error',
-            message: r.message
+            type: "error",
+            message: r.message,
           });
         }
       });
@@ -693,11 +723,13 @@ export default {
     async addresource() {
       this.addResourceLoading = true;
       this.searchaddResource.label = 1;
-      getProjectResource(this.$route.params.id, this.searchaddResource).then(r => {
-        this.list1 = r.content.content;
-        this.addResourceMetadata = r.metadata;
-        this.addResourceLoading = false;
-      });
+      getProjectResource(this.$route.params.id, this.searchaddResource).then(
+        (r) => {
+          this.list1 = r.content.content;
+          this.addResourceMetadata = r.metadata;
+          this.addResourceLoading = false;
+        }
+      );
       this.addResourceSpace = true;
       // const res = await requestParams(getProjectResource, this.info.alias, this.searchaddResource);
       // this.list1 = res.content.content;
@@ -736,17 +768,17 @@ export default {
       for (var i = 0; i < this.patchDeleted.length; i++) {
         data.push(this.patchDeleted[i].resourceAlias);
       }
-      addProjectResource(this.$route.params.id, data).then(r => {
+      addProjectResource(this.$route.params.id, data).then((r) => {
         if (r.code == 200) {
           this.fetchData();
           this.$notify({
-            type: 'success',
-            message: r.message
+            type: "success",
+            message: r.message,
           });
         } else {
           this.$notify({
-            type: 'info',
-            message: r.message
+            type: "info",
+            message: r.message,
           });
         }
         this.addResourceSpace = false;
@@ -754,11 +786,11 @@ export default {
     },
     back() {
       this.$router.push({
-        path: '/tenementCentre/projectManagement'
+        path: "/tenementCentre/projectManagement",
       }); // 返回上一层
     },
     addProject() {
-      const href = location.protocol + '//' + location.hostname + ':8090/html/newBuyDetail.html?id=15#?';
+      const href = baseURL.portalPath + "/html/newBuyDetail.html?id=15#?";
       location.href = href;
     },
     handleChange(value, direction, movedKeys) {
@@ -771,45 +803,45 @@ export default {
       this.middleValue = value;
     },
     deleteUser(id) {
-      this.$confirm('是否将该用户移出当前项目组?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("是否将该用户移出当前项目组?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
           const data = [];
           data.push(id);
-          deleteProjectUser(this.$route.params.id, data).then(r => {
+          deleteProjectUser(this.$route.params.id, data).then((r) => {
             this.fetchData();
             if (r.code == 201) {
               this.fetchData();
               this.$notify({
-                type: 'success',
-                message: r.message
+                type: "success",
+                message: r.message,
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消删除'
+            type: "info",
+            message: "已取消删除",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
 @import "../../rewrite.scss";
-/deep/ .el-pagination{
-  white-space:inherit;
+/deep/ .el-pagination {
+  white-space: inherit;
 }
-/deep/ .el-form-item__content{
+/deep/ .el-form-item__content {
   margin-left: 10px !important;
 }
-.float-right{
-  float:right !important;
+.float-right {
+  float: right !important;
 }
 .return {
   margin-top: 7px;
@@ -829,7 +861,7 @@ export default {
   line-height: 32px;
   font-size: 14px;
 }
-.xqColor{
+.xqColor {
   color: #666;
 }
 </style>

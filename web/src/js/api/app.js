@@ -15,13 +15,13 @@ const baseURL = {
 /**
  * 以下代码本地启动需要注释掉
  */
-
-const arr = document.querySelector("html").dataset.promiseBaseUrl.split(";");
-arr.forEach(item => {
-    const path = item.split("|");
-    baseURL[path[0]] = path[1];
-});
+// const arr = document.querySelector("html").dataset.promiseBaseUrl.split(";");
+// arr.forEach(item => {
+//     const path = item.split("|");
+//     baseURL[path[0]] = path[1];
+// });
 
 //****************/
 module.exports = baseURL;
-//import baseURL from '@/api/app.js';
+console.log(baseURL)
+    //import baseURL from '@/api/app.js';

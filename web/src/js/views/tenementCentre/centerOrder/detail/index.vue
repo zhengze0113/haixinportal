@@ -35,23 +35,25 @@ text-align: center;"
       <el-col :span="16" :offset="1">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">订&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
-            <el-col :span="16" class="xqColor">{{ lists.sn }}</el-col>
+            <el-col :span="8" class="xqColor"
+              >订&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col
+            >
+            <el-col :span="16">{{ lists.sn }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">组织信息：</el-col>
-            <el-col :span="16" class="xqColor"
+            <el-col :span="8" class="xqColor">组织信息：</el-col>
+            <el-col :span="16"
               >{{ lists.tenantName }}-{{ lists.organizationName }}</el-col
             >
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">下单时间：</el-col>
-            <el-col :span="16" class="xqColor">{{ lists.gmtCreate }}</el-col>
+            <el-col :span="8" class="xqColor">下单时间：</el-col>
+            <el-col :span="16">{{ lists.gmtCreate }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">订单状态：</el-col>
+            <el-col :span="8" class="xqColor">订单状态：</el-col>
             <el-col :span="16">
               <el-tag :type="lists.statusTxtType" size="small">{{
                 lists.statusName
@@ -59,19 +61,21 @@ text-align: center;"
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8" style="line-height:22px">所属项目：</el-col>
-            <el-col :span="16" class="xqColor">
+            <el-col :span="8" class="xqColor" style="line-height:22px">所属项目：</el-col>
+            <el-col :span="16" >
               {{ lists.projectName }}
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8" style="line-height:22px">下&nbsp;&nbsp;单&nbsp;&nbsp;人：</el-col>
-            <el-col :span="16" class="xqColor">{{ lists.userName }}</el-col>
+            <el-col :span="8" class="xqColor" style="line-height:22px"
+              >下&nbsp;&nbsp;单&nbsp;&nbsp;人：</el-col
+            >
+            <el-col :span="16" >{{ lists.userName }}</el-col>
           </el-col>
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8" style="line-height:22px">订单类别：</el-col>
+            <el-col :span="8" class="xqColor" style="line-height:22px">订单类别：</el-col>
             <el-col :span="16">
               <el-tag :type="lists.orderTypeTxtType" size="small">{{
                 lists.orderTypeName
@@ -113,7 +117,6 @@ text-align: center;"
                           v-for="(item, index) in scope.row.items.params"
                           :key="index"
                         >
-                          <!-- {{ scope.row.items == null ? "" : scope.row.items.params }} -->
                           {{ item.key }}:{{ item.value }}
                         </div>
                       </template>
@@ -128,20 +131,23 @@ text-align: center;"
                         <span>{{ scope.row.gmtCreate }}</span>
                       </template>
                     </el-table-column> -->
-                    <el-table-column label="单价" align="center">
+                      <el-table-column label="单价" align="center">
                       <template slot-scope="scope">
                         <span>{{
-                          scope.row.items == null
-                            ? ""
-                            : scope.row.items.basicPrice
+                          parseInt(scope.row.items.basicPrice)/parseInt(scope.row.items.duration)
+                        }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="时长" align="center">
+                      <template slot-scope="scope">
+                        <span>{{
+                          scope.row.items == null ? "" : scope.row.items.duration
                         }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="数量" align="center">
                       <template slot-scope="scope">
-                        <span>{{
-                          scope.row.items == null ? "" : scope.row.items.amount
-                        }}</span>
+                        <span>{{1}}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="订单价格" align="center">
@@ -269,6 +275,7 @@ export default {
             onClick(picker) {
               const end = new Date();
               const start = new Date();
+              
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
               picker.$emit("pick", [start, end]);
             },
@@ -412,7 +419,7 @@ export default {
       this.fetchData();
     },
     back() {
-      console.log(this.$route.params.billHtml)
+      console.log(this.$route.params.billHtml);
       if (this.$route.params.billHtml == "true") {
         this.$router.push({
           path: "/tenementCentre/billCenter/billTable",
@@ -453,7 +460,7 @@ export default {
   line-height: 32px;
   font-size: 14px;
 }
-.xqColor{
+.xqColor {
   color: #666;
 }
 </style>

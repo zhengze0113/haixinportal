@@ -52,8 +52,38 @@
         </el-row>
       </div>
     </el-row>
-    <el-row :gutter="20" style="margin-top:20px;padding-right:10px">
-      <el-col :span="4" style="padding-right:20px;">
+    <el-row :gutter="20" style="margin-top:20px;">
+      <el-col v-if="width1280">
+        <el-row>
+          <el-col :span="12" class="left-card1">
+            <el-row style="text-align: center;padding: 20px 20px;">
+              <el-tag size="medium" class="boder">账单总金额</el-tag>
+            </el-row>
+            <el-row
+              class="price"
+              style="text-align: center;padding: 20px 20px 20px;"
+            >
+              ￥{{ totalAmount }}
+            </el-row>
+          </el-col>
+          <el-col :span="12" style="padding-left:10px">
+            <el-row
+              style=" background: #fff;padding: 20px 20px;text-align: center;"
+            >
+              <el-tag size="medium" class="boder" type="danger"
+                >未结算金额</el-tag
+              >
+            </el-row>
+            <el-row
+              class="price"
+              style=" background: #fff;text-align: center;padding: 20px 20px 20px;"
+            >
+              ￥{{ unsettlementAmount }}
+            </el-row>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-col v-if="!width1280" :span="4" style="padding-right:20px;">
         <el-row>
           <el-col class="left-card">
             <el-row class="card-title">
@@ -71,7 +101,84 @@
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="20" class="table-css">
+      <el-col
+        v-if="width1280"
+        :span="24"
+        class="table-css"
+        style="margin-top:10px"
+      >
+        <div class="grid-content bg-purple">
+          <el-table
+            v-loading="listLoading"
+            :data="list"
+            :expand-row-keys="expandRowKeys"
+            size="small"
+            element-loading-text="Loading"
+            fit
+            highlight-current-row
+            row-key="id"
+            @row-click="handleRowClick"
+          >
+            <el-table-column label="账单号" align="center">
+              <template slot-scope="scope">
+                 <router-link
+                  :to="{
+                    path:
+                      '/operatingCentre/billCenter/billTable/detail/' +
+                      scope.row.id,
+                  }"
+                  class="link"
+                  >{{ scope.row.billNo }}</router-link
+                >
+              </template>
+            </el-table-column>
+            <el-table-column label="结算周期" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.billStart }}-{{ scope.row.billStop }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算对象" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.tenantName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算方式" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.payModeType" size="small">
+                  {{ scope.row.payMode }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单数量" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.orderQuantity }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="结算金额（￥）" align="center">
+              <template slot-scope="scope">{{
+                scope.row.settlementAmount
+              }}</template>
+            </el-table-column>
+
+            <el-table-column label="结算状态" align="center">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.settlementStatusType" size="small">
+                  {{ scope.row.settlementStatus }}
+                </el-tag>
+              </template> </el-table-column
+            >settlementStatus
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <el-button size="small" @click="lookDetail(scope.row.id)"
+                  >查看</el-button
+                >
+              </template> </el-table-column
+            >、
+          </el-table>
+          <pagination :metadata="metadata" :table-change="tableChange" />
+        </div>
+      </el-col>
+      <el-col v-if="!width1280" :span="20" class="table-css">
         <div class="grid-content bg-purple">
           <el-table
             v-loading="listLoading"
@@ -188,6 +295,7 @@ export default {
   },
   data() {
     return {
+      width1280: false,
       totalAmount: 0,
       unsettlementAmount: 0,
       list: [],
@@ -222,6 +330,9 @@ export default {
   },
   computed: {},
   created() {
+    if (window.screen.width <= 1280) {
+      this.width1280 = true;
+    }
     this.fetchData();
     this.getTenantOrgan();
   },
@@ -448,6 +559,9 @@ export default {
   &:last-child {
     margin-top: 20px;
   }
+}
+.left-card1 {
+  background: #fff;
 }
 .el-table--fit {
   border: 0px solid #ebeef5;

@@ -35,15 +35,15 @@
       <el-col :span="18" :offset="1" style="margin: 20px 0px 20px 40px;">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">帐&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
-            <el-col :span="16" class="xqColor">{{ info.billNo }}</el-col>
+            <el-col :span="8" class="xqColor">帐&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
+            <el-col :span="16">{{ info.billNo }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">订单金额：</el-col>
-            <el-col :span="16" class="xqColor">￥{{ info.settlementAmount }}</el-col>
+            <el-col :span="8" class="xqColor">订单金额：</el-col>
+            <el-col :span="16">￥{{ info.settlementAmount }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">结算金额：</el-col>
+            <el-col :span="8" class="xqColor">结算金额：</el-col>
             <el-col :span="16" style="color:#0261A7"
               >￥{{ info.settlementAmount }}</el-col
             >
@@ -51,16 +51,16 @@
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">结算对象：</el-col>
-            <el-col :span="16" class="xqColor">{{ info.userName }}</el-col>
+            <el-col :span="8" class="xqColor">结算对象：</el-col>
+            <el-col :span="16">{{ info.userName }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">订单数量：</el-col>
-            <el-col :span="16" class="xqColor">{{ info.orderQuantity }}</el-col>
+            <el-col :span="8" class="xqColor">订单数量：</el-col>
+            <el-col :span="16" >{{ info.orderQuantity }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">结算状态：</el-col>
-            <el-col :span="16" class="xqColor">
+            <el-col :span="8" class="xqColor">结算状态：</el-col>
+            <el-col :span="16">
               <el-tag :type="info.settlementStatusType" size="small">
                 {{ info.settlementStatus }}
               </el-tag>
@@ -69,14 +69,14 @@
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">结算周期：</el-col>
-            <el-col :span="16" class="xqColor">
+            <el-col :span="8" class="xqColor">结算周期：</el-col>
+            <el-col :span="16">
               {{ info.billStart }} - {{ info.billStop }}
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">出具时间：</el-col>
-            <el-col :span="16" class="xqColor">{{ info.gmtCreate }}</el-col>
+            <el-col :span="8" class="xqColor">出具时间：</el-col>
+            <el-col :span="16">{{ info.gmtCreate }}</el-col>
           </el-col>
         </el-col>
       </el-col>

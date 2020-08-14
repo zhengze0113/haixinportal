@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <!--基本信息-->
     <el-form
       :model="ruleForm"
@@ -18,7 +18,7 @@
         label="产品logo"
         prop="fileList1"
         :rules="[
-          { required: true, message: '请添加产品logo', trigger: 'blur' }
+          { required: true, message: '请添加产品logo', trigger: 'blur' },
         ]"
       >
         <el-upload
@@ -54,7 +54,7 @@
         label="产品背景图"
         prop="fileList2"
         :rules="[
-          { required: true, message: '请添加产品背景图', trigger: 'blur' }
+          { required: true, message: '请添加产品背景图', trigger: 'blur' },
         ]"
       >
         <el-upload
@@ -129,7 +129,10 @@
           </el-option>
         </el-select>
       </el-form-item>
-
+      <el-form-item label="原服务目录id" prop="productId">
+        <el-input placeholder="请输入原服务目录id" v-model="ruleForm.productId">
+        </el-input>
+      </el-form-item>
       <el-form-item label="产品介绍" prop="productintroduction">
         <el-input
           type="textarea"
@@ -162,7 +165,7 @@
 import {
   editcloudproductInfo,
   Servicecatalog,
-  editcloudproductimg
+  editcloudproductimg,
 } from "@/api/serviceOperatingcms";
 import { requestParams, parseHash } from "@/utils/urlParam";
 import baseURL from "@/api/app.js";
@@ -170,12 +173,12 @@ export default {
   props: {
     active: {
       type: Number,
-      default: 2
+      default: 2,
     },
     object: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   data() {
     return {
@@ -196,14 +199,15 @@ export default {
         fileList2: "",
         fileList3: "",
         name: "",
+        productId:"",
         productintroduction: "",
         is_edit: false,
         servicecatalog_id: "",
-        is_putaway: false
+        is_putaway: false,
       },
       fileList_1: [],
       fileList_2: [],
-      fileList_3: []
+      fileList_3: [],
     };
   },
   mounted() {
@@ -224,7 +228,7 @@ export default {
         this.fileList_1.push(imageObject);
         this.hideUpload_1 = true;
         this.object.fileList1 = "值";
-      }else{
+      } else {
         this.object.fileList1 = "";
       }
       if (this.object.cover != null) {
@@ -234,7 +238,7 @@ export default {
         this.fileList_2.push(imageObject);
         this.hideUpload_2 = true;
         this.object.fileList2 = "值";
-      }else{
+      } else {
         this.object.fileList2 = "";
       }
       if (this.object.icon != null) {
@@ -244,14 +248,14 @@ export default {
         this.fileList_3.push(imageObject);
         this.hideUpload_3 = true;
         this.object.fileList3 = "值";
-      }else{
+      } else {
         this.object.fileList3 = "";
       }
     },
     // 初始化下拉框
     initSelect() {
       const params = { parentId: 0 };
-      Servicecatalog(params).then(r => {
+      Servicecatalog(params).then((r) => {
         this.selectList = r;
       });
     },
@@ -262,6 +266,7 @@ export default {
       params.append("_id", this.object._id);
       params.append("id", this.object.id);
       params.append("productintroduction", this.ruleForm.productintroduction);
+      params.append("productId", this.ruleForm.productId);
       params.append("servicecatalog_id", this.ruleForm.servicecatalog_id);
       params.append("is_putaway", this.ruleForm.is_putaway);
 
@@ -285,17 +290,16 @@ export default {
         params.append("icon", this.$refs.upload_3.uploadFiles[0].raw);
       }
 
-      this.$refs["update_ruleForm"].validate(valid => {
+      this.$refs["update_ruleForm"].validate((valid) => {
         if (valid) {
-          
-          editcloudproductimg(this.object.id, params).then(r => {
+          editcloudproductimg(this.object.id, params).then((r) => {
             if (r.id != "") {
               //修改成功
               this.$emit("listenToChildEvent", this.active);
             } else {
               this.$notify({
                 type: "info",
-                message: "修改失败"
+                message: "修改失败",
               });
             }
           });
@@ -370,8 +374,8 @@ export default {
       } else {
         this.hideUpload_3 = fileList.length >= 1;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

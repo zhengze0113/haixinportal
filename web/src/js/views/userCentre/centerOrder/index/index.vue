@@ -217,6 +217,7 @@ import { getcloudServiceCatalogList,
   getServiceSubdirectoryMessage } from '@/api/serviceOperating';
 import { getUserInfo } from '@/utils/auth';
 import { requestParams, parseHash } from '@/utils/urlParam';
+import baseURL from '@/api/app';
 export default {
   components: {
     Pagination
@@ -503,7 +504,7 @@ export default {
       this.listLoading = false;
     },
     changeConfiguration(id, type) {
-      window.location.href = `${location.protocol}//${location.hostname}:8090/html/orderRenewalChange.html?id=${id}&orderType=${type}`;
+      window.location.href = `${baseURL.portalPath}/html/orderRenewalChange.html?id=${id}&orderType=${type}`;
     },
     async getOrderInfo() {
       for (var z = 0; z < this.list.length; z++) {
@@ -529,6 +530,7 @@ export default {
         var items = r.content.items[0] == undefined ? '' : r.content.items[0];
 
         this.list[z].items = items;
+     
         this.list[z].items.isSpace = items.platformParams.indexOf('/cmss/v1/resource/space') != -1;
         this.list[z].items.catalog = r.content.catalog;
         this.list[z].items.productName = r.content.productName;

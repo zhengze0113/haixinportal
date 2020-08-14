@@ -35,15 +35,19 @@
       <el-col :span="18" :offset="1" style="margin: 20px 0px 20px 40px;">
         <el-col :span="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">帐&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col>
-            <el-col :span="16"  class="xqColor">{{ info.billNo }}</el-col>
+            <el-col :span="8" class="xqColor"
+              >帐&nbsp;&nbsp;单&nbsp;&nbsp;号：</el-col
+            >
+            <el-col :span="16">{{ info.billNo }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">订单金额：</el-col>
-            <el-col :span="16"  class="xqColor">￥{{ info.settlementAmount }}</el-col>
+            <el-col :span="8" class="xqColor">订单金额：</el-col>
+            <el-col :span="16" 
+              >￥{{ info.settlementAmount }}</el-col
+            >
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">结算金额：</el-col>
+            <el-col :span="8" class="xqColor">结算金额：</el-col>
             <el-col :span="16" style="color:#0261A7"
               >￥{{ info.settlementAmount }}</el-col
             >
@@ -51,16 +55,16 @@
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">结算对象：</el-col>
-            <el-col :span="16"  class="xqColor">{{ info.projectName }}</el-col>
+            <el-col :span="8" class="xqColor">结算对象：</el-col>
+            <el-col :span="16" >{{ info.projectName }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">订单数量：</el-col>
-            <el-col :span="16"  class="xqColor">{{ info.orderQuantity }}</el-col>
+            <el-col :span="8" class="xqColor">订单数量：</el-col>
+            <el-col :span="16" >{{ info.orderQuantity }}</el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">结算状态：</el-col>
-            <el-col :span="16"  class="xqColor">
+            <el-col :span="8" class="xqColor">结算状态：</el-col>
+            <el-col :span="16" >
               <el-tag :type="info.settlementStatusType" size="small">
                 {{ info.settlementStatus }}
               </el-tag>
@@ -69,14 +73,14 @@
         </el-col>
         <el-col :spam="24" class="infoShow">
           <el-col :span="8">
-            <el-col :span="8">结算周期：</el-col>
-            <el-col :span="16"  class="xqColor">
+            <el-col :span="8" class="xqColor">结算周期：</el-col>
+            <el-col :span="16" >
               {{ info.billStart }} - {{ info.billStop }}
             </el-col>
           </el-col>
           <el-col :span="8">
-            <el-col :span="8">出具时间：</el-col>
-            <el-col :span="16" class="xqColor">{{ info.gmtCreate }}</el-col>
+            <el-col :span="8" class="xqColor">出具时间：</el-col>
+            <el-col :span="16" >{{ info.gmtCreate }}</el-col>
           </el-col>
         </el-col>
       </el-col>
@@ -144,7 +148,6 @@
                   </template>
                 </el-table-column>
               </el-table>
-              
             </div>
           </div>
         </el-col>
@@ -165,7 +168,7 @@ import { requestParams, parseHash } from "@/utils/urlParam";
 import Vue from "vue";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   data() {
     return {
@@ -179,12 +182,12 @@ export default {
         number: 1,
         numberOfElements: 10,
         totalElements: 1,
-        totalPages: 1
+        totalPages: 1,
       },
       value1: "",
       value2: "",
       info: "",
-      lists: ""
+      lists: "",
     };
   },
   created() {
@@ -194,13 +197,13 @@ export default {
   methods: {
     particulars(data) {
       this.$router.push({
-        path: "/tenementCentre/centerOrder/detail/" + data.id + "/true"
+        path: "/tenementCentre/centerOrder/detail/" + data.id + "/true",
       });
     },
     async initSelect() {},
     comeback() {
       this.$router.push({
-        path: "/tenementCentre/billCenter/billTable"
+        path: "/tenementCentre/billCenter/billTable",
       });
     },
     tableChange({ page, rows }) {
@@ -209,7 +212,7 @@ export default {
       this.fetchData();
     },
     getInfo() {
-      getTenantSummaryBillDetails(this.$route.params.id).then(r => {
+      getTenantSummaryBillDetails(this.$route.params.id).then((r) => {
         var billInfo = r.content;
         this.list = r.content.orders;
         let lists = JSON.parse(JSON.stringify(billInfo));
@@ -228,7 +231,7 @@ export default {
         for (var i = 0; i < this.list.length; i++) {
           let lists = JSON.parse(JSON.stringify(this.list[i]));
 
-          userInfo(lists.userId).then(res => {
+          userInfo(lists.userId).then((res) => {
             console.log(res);
             Vue.set(lists, "userName", res.content.userName);
           });
@@ -256,8 +259,8 @@ export default {
         }
         console.log(this.orderList);
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -280,7 +283,7 @@ export default {
   color: #333;
   font-weight: bold;
 }
-.xqColor{
+.xqColor {
   color: #666;
 }
 </style>
