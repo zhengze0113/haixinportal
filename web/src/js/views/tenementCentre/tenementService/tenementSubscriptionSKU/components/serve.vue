@@ -234,7 +234,6 @@ export default {
       console.log(pagination);
     },
     handleClick(row) {
-      alert(1);
     },
     delItem() {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {

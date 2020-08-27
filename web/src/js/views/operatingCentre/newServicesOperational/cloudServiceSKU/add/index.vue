@@ -1,797 +1,494 @@
 <template>
   <div>
-    <el-row :gutter="20">
-      <el-col :span="24" :offset="0">
-        <div class="grid-content bg-purple">
-          <el-card class="box-card">
-            <el-collapse v-model="activeName" accordion @change="handleChange">
-              <el-collapse-item title="步骤1：基本信息" name="1">
-                <el-row :gutter="20">
-                  <el-form :inline="true" :model="form" label-width="80px">
-                    <el-row>
-                      <el-col :span="10" :offset="2">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="服务目录" style="margin-bottom:2px;">
-                            <el-cascader
-                              :props="props"
-                              :options="options"
-                              :show-all-levels="false"
-                              v-model="value"
-                              style="width:139%"
-                              @change="checkServiceCatalog(value)"
-                            />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="0">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item v-if="isTest" label="所属资源">
-                            <SelectPage
-                              :cities="cities"
-                              :metadata-select="metadataSelect"
-                              width="140%"
-                              @getServiceId="getServiceId"
-                              @getCreation="selctPage"
-                            />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="2">
-                        <div class="grid-content bg-purple">
-                          <el-form-item label="名称" style="margin-bottom:2px;">
-                            <el-input v-model=" form.name" style="width:150%;" placeholder="名称" />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="0">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="编码">
-                            <el-input v-model=" form.code" style="width:150%;" placeholder="编码" />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="2">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="图标" style="margin-bottom:2px;">
-                            <el-input v-model=" form.icon" style="width:150%;" placeholder="图标" />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="0">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="标签">
-                            <el-input v-model=" form.tags" style="width:150%;" placeholder="标签" />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="2">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="库存">
-                            <el-input v-model="form.stock" style="width:150%;" placeholder="库存" />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="0">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="描述">
-                            <el-input
-                              v-model="form.description"
-                              :rows="4"
-                              style="width:162.5%;"
-                              type="textarea"
-                              placeholder="请输入内容"
-                            />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                    </el-row>
-                  </el-form>
-                </el-row>
-              </el-collapse-item>
-              <el-collapse-item title="步骤2：规格信息" name="2">
-                <el-row>
-                  <el-col :span="22" :offset="1">
-                    <el-collapse v-if="reservedParamers.length>0" v-model="activeName1" accordion>
-                      <el-collapse-item name="1" title="创建">
-                        <el-row v-for="(item,i) in reservedParamers" :key="i">
-                          <el-col :span="5">
-                            <label
-                              class="el-form-item__label"
-                              style="font-size:14px;"
-                            >{{ item.name }}</label>
-                          </el-col>
-                          <el-col :span="5" :offset="1">
-                            <!-- <el-input :type="item.clazz" v-model="item.defaultValue"   size="small"/> -->
-                            <el-input
-                              v-if="item.clazz=='String'||item.clazz=='Number'"
-                              :type="item.clazz"
-                              v-model="item.defaultValue"
-                              size="small"
-                            />
-                            <el-select
-                              v-else-if="item.clazz=='Select'"
-                              v-model="atest"
-                              size="small"
-                            >
-                              <el-option
-                                v-for="(ite,index) in arr"
-                                :key="index"
-                                :value="ite"
-                                :label="ite"
-                              />
-                            </el-select>
-                          </el-col>
-                          <el-col :span="2" :offset="3">
-                            <el-button
-                              v-if="item.editable==true"
-                              size="mini"
-                              @click="item.editable=false"
-                            >可编辑</el-button>
-                            <el-button
-                              v-if="item.editable==false"
-                              size="mini"
-                              @click="item.editable=true"
-                            >不可编辑</el-button>
-                          </el-col>
-                          <el-col :span="5" :offset="0">
-                            <!-- <createResouce
-                              @getMessage="getM"
-                              :madatePrice="madatePrice"
-                              :priceall="priceall"
-                            ></createResouce>-->
-                            <createResouce :id="item.id" @getMessage="getM" />
-                          </el-col>
-                        </el-row>
-                      </el-collapse-item>
-                    </el-collapse>
-                    <el-collapse v-if="reservedParamers.length==0" v-model="activeName1" accordion>
-                      <el-collapse-item name="1" title="创建" />
-                    </el-collapse>
-
-                    <!-- 删除 -->
-                    <el-collapse v-if="reserveddeletion.length>0" v-model="activeName1" accordion>
-                      <el-collapse-item name="2" title="删除">
-                        <el-row v-for="(item,i) in reserveddeletion" :key="i">
-                          <el-col :span="5">
-                            <label
-                              class="el-form-item__label"
-                              style="font-size:14px;"
-                            >{{ item.name }}</label>
-                          </el-col>
-                          <el-col :span="5" :offset="1">
-                            <el-input
-                              v-if="item.clazz=='String'||item.clazz=='Number'"
-                              :type="item.clazz"
-                              v-model="item.defaultValue"
-                              size="small"
-                            />
-                            <el-select
-                              v-else-if="item.clazz=='Select'"
-                              v-model="atest"
-                              size="small"
-                            >
-                              <el-option
-                                v-for="(ite,index) in arr"
-                                :key="index"
-                                :value="ite"
-                                :label="ite"
-                              />
-                            </el-select>
-
-                          </el-col>
-                          <el-col :span="2" :offset="3">
-                            <el-button
-                              v-if="item.editable==true"
-                              size="mini"
-                              @click="item.editable=false"
-                            >可编辑</el-button>
-                            <el-button
-                              v-if="item.editable==false"
-                              size="mini"
-                              @click="item.editable=true"
-                            >不可编辑</el-button>
-                          </el-col>
-                          <el-col :span="5" :offset="0">
-                            <createResouce :id="item.id" @getMessage="getM" />
-                          </el-col>
-                        </el-row>
-                      </el-collapse-item>
-                    </el-collapse>
-                    <el-collapse v-if="reserveddeletion.length==0" v-model="activeName1" accordion>
-                      <el-collapse-item name="2" title="删除" />
-                    </el-collapse>
-                    <!-- 变更 -->
-                    <el-collapse
-                      v-if="reservedmodification.length>0"
-                      v-model="activeName1"
-                      accordion
-                    >
-                      <el-collapse-item name="3" title="变更">
-                        <el-row v-for="(item,i) in reservedmodification" :key="i">
-                          <el-col :span="5">
-                            <label
-                              class="el-form-item__label"
-                              style="font-size:14px;"
-                            >{{ item.name }}</label>
-                          </el-col>
-                          <el-col :span="5" :offset="1">
-                            <el-input
-                              v-if="item.clazz=='String'||item.clazz=='Number'"
-                              :type="item.clazz"
-                              v-model="item.defaultValue"
-                              size="small"
-                            />
-                            <el-select
-                              v-else-if="item.clazz=='Select'"
-                              v-model="atest"
-                              size="small"
-                            >
-                              <el-option
-                                v-for="(ite,index) in arr"
-                                :key="index"
-                                :value="ite"
-                                :label="ite"
-                              />
-                            </el-select>
-                          </el-col>
-                          <el-col :span="2" :offset="3">
-                            <el-button
-                              v-if="item.editable==true"
-                              size="mini"
-                              @click="item.editable=false"
-                            >可编辑</el-button>
-                            <el-button
-                              v-if="item.editable==false"
-                              size="mini"
-                              @click="item.editable=true"
-                            >不可编辑</el-button>
-                          </el-col>
-                          <el-col :span="5" :offset="0">
-                            <createResouce :id="item.id" @getMessage="getM" />
-                          </el-col>
-                        </el-row>
-                      </el-collapse-item>
-                    </el-collapse>
-                    <el-collapse
-                      v-if="reservedmodification.length==0"
-                      v-model="activeName1"
-                      accordion
-                    >
-                      <el-collapse-item name="3" title="变更" />
-                    </el-collapse>
+    <el-card class="box-card">
+      <div slot="header" class="clearfix" style="color:#0261a7">
+        <span>新建SKU</span>
+        <el-button
+          type="primary"
+          size="mini"
+          icon="el-icon-back"
+          class="right"
+          @click="dialogVisible()"
+        >返回</el-button>
+      </div>
+      <el-row>
+        <el-col :span="23">
+          <span class="title">基本信息</span>
+        </el-col>
+        <el-form
+          ref="cloudSkuFrom"
+          :model="cloudSkuFrom"
+          :rules="cloudSkuFrom"
+          label-width="120px"
+          label-position="rigth"
+          class="margin-top"
+        >
+          <el-row style="padding-top: 20px;">
+            <el-col :span="12">
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="code">
+                  <span slot="label" class="labelText">规格编码：</span>
+                  <el-col :span="23">
+                    <el-input disabled v-model="cloudSkuFrom.code" placeholder="系统自动生成"></el-input>
                   </el-col>
-                </el-row>
-              </el-collapse-item>
-              <el-collapse-item title="步骤3：计价信息" name="3">
-                <el-row :gutter="20">
-                  <el-form :inline="true" :model="form" label-width="80px">
-                    <el-row>
-                      <el-col :span="10" :offset="5">
-                        <div class="grid-content bg-purple">
-                          <el-form-item label="计价方式">
-                            <!-- <el-radio v-model="form.price.chargeMode"   label="FIXED"> </el-radio>
-                            <el-radio v-model="form.price.chargeMode"   label="FLEXABLE"></el-radio>-->
-
-                            <input
-                              :checked="disa"
-                              v-model="form.price.chargeMode"
-                              type="radio"
-                              name="radio"
-                              value="FIXED"
-                              @click="disable=true"
-                            >
-                            固定计价
-                            <input
-                              v-model="form.price.chargeMode"
-                              type="radio"
-                              name="radio"
-                              value="FLEXIBLE"
-                              @click="disable=false"
-                            >
-                            灵活计价
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="5">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="金额">
-                            <el-input
-                              :disabled="disable"
-                              v-model="sums"
-                              style="width:100%;"
-                              placeholder="金额"
-                            />
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                      <el-col :span="10" :offset="5">
-                        <div class="grid-content bg-purple-light">
-                          <el-form-item label="计价周期">
-                            <el-radio v-model=" form.price.chargePeriod" value="DAY" label="DAY">日</el-radio>
-                            <el-radio
-                              v-model=" form.price.chargePeriod"
-                              value="MONTH"
-                              label="MONTH"
-                            >月</el-radio>
-                            <el-radio v-model=" form.price.chargePeriod" value="YEAR" label="YEAR">年</el-radio>
-                          </el-form-item>
-                        </div>
-                      </el-col>
-                    </el-row>
-                  </el-form>
-                </el-row>
-              </el-collapse-item>
-            </el-collapse>
-            <el-row>
-              <el-col :span="4" :offset="20" style="margin-top:20px;">
-                <el-button size="small" @click="comeback()">返回</el-button>
-
-                <el-button :loading="loading" size="small" type="primary" @click="createResources()">创建</el-button>
+                </el-form-item>
               </el-col>
-            </el-row>
-          </el-card>
-        </div>
-      </el-col>
-    </el-row>
+              <el-col :span="23" :offset="1">
+                <el-form-item
+                  prop="name"
+                  :rules="[
+                        { required: true, message: '规格名称不能为空' },
+                      ]"
+                >
+                  <span slot="label" class="labelText">规格名称：</span>
+                  <el-col :span="23">
+                    <el-input v-model="cloudSkuFrom.name" placeholder="请输入关键字" />
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item
+                  prop="keyword"
+                  :rules="[
+                        { required: true, message: '关键字不能为空' },
+                      ]"
+                >
+                  <span slot="label" class="labelText">关键字：</span>
+                  <el-col :span="23">
+                    <el-input
+                      onkeyup="value=value.replace(/[^\a-\z]/g,'')"
+                      onpaste="value=value.replace(/[^\a-\z]/g,'')"
+                      oncontextmenu="value=value.replace(/[^\a-\z]/g,'')"
+                      v-model="cloudSkuFrom.keyword"
+                      placeholder="请输入描述信息"
+                    />
+                  </el-col>
+                </el-form-item>
+              </el-col>
+            </el-col>
+            <el-col :span="12">
+              <el-col :span="23" :offset="1">
+                <el-form-item
+                  prop="resourceCode"
+                  :rules="[
+                        { required: true, message: '云资源不能为空' },
+                      ]"
+                >
+                  <span slot="label" class="labelText">云资源：</span>
+                  <el-col :span="23">
+                    <el-select
+                      v-model="cloudSkuFrom.resourceCode"
+                      @change="resourcePrice"
+                      size="mini"
+                      placeholder="全部"
+                    >
+                      <el-option
+                        v-for="item in list1"
+                        :key="item.code"
+                        :label="item.name"
+                        :value="item.code"
+                      />
+                    </el-select>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item
+                  prop="serviceCode"
+                  :rules="[
+                        { required: true, message: '云服务不能为空' },
+                      ]"
+                >
+                  <span slot="label" class="labelText">云服务：</span>
+                  <el-col :span="23">
+                    <el-select v-model="cloudSkuFrom.serviceCode" size="mini" placeholder="请选择云服务">
+                      <el-option
+                        v-for="item in list"
+                        :key="item.code"
+                        :label="item.name"
+                        :value="item.code"
+                      />
+                    </el-select>
+                  </el-col>
+                </el-form-item>
+              </el-col>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="23">
+              <span class="title">资源配置</span>
+            </el-col>
+            <el-col :span="12" style="padding-top: 20px;">
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="masterIp" style="margin-bottom:0px">
+                  <span slot="label" class="labelText">CPU（Core）：</span>
+                  <el-col :span="23">
+                    <el-input-number
+                      @input="updatePrice"
+                      width="100%"
+                      controls-position="right"
+                      :min="1"
+                      :max="10"
+                      v-model="cloudSkuFrom.cpuCores"
+                      placeholder="请输入CPU（Core）"
+                    />
+                  </el-col>
+                </el-form-item>
+                <el-col :span="19" :offset="5" style="line-height: 20px;">
+                  <span class="tishi">CPU单价：1 Core = {{cpuPrice}} 元/月</span>
+                </el-col>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="root" style="margin-bottom:0px">
+                  <span slot="label" class="labelText">内存（GB）：</span>
+                  <el-col :span="23">
+                    <el-input-number
+                      @input="updatePrice"
+                      controls-position="right"
+                      :min="1"
+                      :max="100"
+                      v-model="cloudSkuFrom.memory"
+                      placeholder="请输入内存（GB）"
+                    />
+                  </el-col>
+                </el-form-item>
+                <el-col :span="19" :offset="5" style="line-height: 20px;">
+                  <span class="tishi"> 内存单价：1 GB = {{memoryPrice}} 元/月</span>
+                </el-col>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="port" style="margin-bottom:0px">
+                  <span slot="label" class="labelText">存储（GB）：</span>
+                  <el-col :span="23">
+                    <el-input-number
+                      @input="updatePrice"
+                      controls-position="right"
+                      :min="1"
+                      :max="1000"
+                      v-model="cloudSkuFrom.storage"
+                      placeholder="请输入存储（GB）"
+                    />
+                  </el-col>
+                </el-form-item>
+                <el-col :span="19" :offset="5" style="line-height: 20px;">
+                  <span class="tishi">存储单价：1 GB = {{storagePrice}} 元/月</span>
+                </el-col>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="protocol">
+                  <span slot="label" class="labelText">成本价（元）：</span>
+                  <el-col :span="23">
+                    <el-input
+                      disabled
+                      controls-position="right"
+                      v-model="cloudSkuFrom.costPrice"
+                      placeholder="请输入成本价（元）"
+                    />
+                  </el-col>
+                </el-form-item>
+              </el-col>
+              <el-col :span="23" :offset="1">
+                <el-form-item prop="host">
+                  <span slot="label" class="labelText">售价（元）：</span>
+                  <el-col :span="23">
+                    <el-input-number
+                      controls-position="right"
+                      :min="1"
+                      :max="1000"
+                      v-model="cloudSkuFrom.price"
+                      placeholder="请输入售价（元）"
+                    />
+                  </el-col>
+                </el-form-item>
+              </el-col>
+            </el-col>
+            <el-col :span="12" style="padding-top: 20px;">
+              <el-col :span="23">
+                <el-form-item prop="masterIp">
+                  <span slot="label" class="labelText">是否生效</span>
+                  <el-tooltip :content="'是否生效: ' + value1" placement="top">
+                    <el-switch
+                      @change="invalid1"
+                      v-model="value1"
+                      active-color="#0261a7"
+                      active-value="是"
+                      inactive-value="否"
+                    ></el-switch>
+                  </el-tooltip>
+                </el-form-item>
+              </el-col>
+
+              <el-col :span="23">
+                <el-form-item prop="masterIp">
+                  <span slot="label" class="labelText">是否生效</span>
+                  <el-tooltip :content="'是否生效: ' + value2" placement="top">
+                    <el-switch
+                      @change="invalid2"
+                      v-model="value2"
+                      active-color="#0261a7"
+                      active-value="是"
+                      inactive-value="否"
+                    ></el-switch>
+                  </el-tooltip>
+                </el-form-item>
+              </el-col>
+              <el-col :span="23">
+                <el-form-item prop="masterIp">
+                  <span slot="label" class="labelText">是否生效</span>
+                  <el-tooltip :content="'是否生效: ' + value3" placement="top">
+                    <el-switch
+                      @change="invalid3"
+                      v-model="value3"
+                      active-color="#0261a7"
+                      active-value="是"
+                      inactive-value="否"
+                    ></el-switch>
+                  </el-tooltip>
+                </el-form-item>
+              </el-col>
+            </el-col>
+          </el-row>
+        </el-form>
+      </el-row>
+      <el-row>
+        <el-col :span="4" :offset="20" style="margin-top:20px;">
+          <el-button size="small" @click="dialogVisible">返回</el-button>
+          <el-button size="small" type="primary" @click="submitForm('cloudSkuFrom')">确定</el-button>
+        </el-col>
+      </el-row>
+    </el-card>
   </div>
 </template>
+
 <script>
-import myInput from './myinput';
-import createResouce from './createResouce';
-import SelectPage from '@/components/selectPage';
+import { requestParams, parseHash } from "@/utils/urlParam";
 import {
-  createdSKU,
+  createdCloudResource,
+  getCloudServiceList,
   getResourcesList,
-  getCloudResourceInfo,
+  createdSKU,
   getPricesList,
-  getcloudServiceCatalogList, // 服务目录
-  getServiceSubdirectoryMessage // 子服务目录
-} from '@/api/serviceOperating';
-import { requestParams, parseHash } from '@/utils/urlParam';
-import Pagination from '@/components/pagination';
-const id = 0;
+} from "@/api/serviceOperating";
+
 export default {
-  components: {
-    createResouce,
-    SelectPage,
-    Pagination,
-    myInput
-  },
+  filters: {},
   data() {
     return {
-      atest: '',
-      select: 'DAY',
-      input3: '',
-      disa: false,
-      disable: true,
-      aaa: '',
-      bbb: 'text',
-      options: [],
-      selectedOptions: [],
-      value: 0,
-      radio: 0,
-      props: {
-        value: 'id',
-        label: 'name',
-        lazy: true,
-        lazyLoad(node, resolve) {
-          const { level } = node;
-          if (level == 0) return;
-          getServiceSubdirectoryMessage(node.data.id).then(r => {
-            resolve(r.content.content);
-          });
-        }
-      },
-      metadata: undefined,
-      expandRowKeys: [],
-      listLoading: true,
       list: [],
-      dialogFormVisible: false,
-      is: false,
-      isTest: false,
-      activeName: '1',
-      activeName1: '1',
-      loading: false,
-      cities: [],
-      priceall: [],
-      dd: [],
-      aa: [],
-      sums: 0,
-      search: { page: 1, rows: 6 },
-      metadataSelect: undefined,
-      madatePrice: undefined,
-      creation: 'creation',
-      deletion: 'deletion',
-      modification: 'modification',
-      form: {
-        catalogId: 0,
-        code: '',
-        description: '',
-        icon: '',
-        initStock: 0,
-        name: '',
-        orgId: 0,
-        price: {
-          chargeMode: 'FIXED',
-          chargePeriod: 'DAY',
-          price: 0,
-          priceItems: [
-            {
-              id: 0,
-              priceId: 0,
-              skuId: 0,
-              source: '',
-              specId: 0
-            }
-          ]
-        },
-        resourceId: 0,
-        serviceId: 0,
-        specContent: '',
-        specs: [
-          {
-            editable: true,
-            name: '',
-            paramKey: '',
-            paramValue: '',
-            skuId: 0,
-            specId: 0,
-            status: '',
-            tags: ''
-          }
-        ],
-        status: 'CREATED',
-        stock: 0,
-        tags: '',
-        tenantId: 0,
-        userId: 0
+      list1: [],
+      value1: "是",
+      value2: "是",
+      value3: "是",
+      fileList: [],
+      cloudSkuFrom: {
+        name: "",
+        keyword: "",
+        code: "",
+        serviceCode: "",
+        resourceCode: "",
+        costPrice: 0,
+        price: 0,
+        cpuCores: 1,
+        memory: 1,
+        storage: 1,
+        chargePeriod: "MONTH",
       },
-      val: 0,
-      reservedParamers: [],
-      reserveddeletion: [],
-      reservedmodification: [],
-      arr: [],
-      arrd: [],
-      arrm: []
+      cpuPrice: 0,
+      memoryPrice: 0,
+      storagePrice: 0,
+      formCloud: false,
+      formEntry: false,
     };
   },
   created() {
-    this.initSelect();
-    this.search = parseHash(this.search);
-  },
-  mounted() {
-    this.isTest = true;
+    this.fetchData();
   },
   methods: {
-    // 初始化下拉框
-    async initSelect() {
-      const res = await requestParams(getResourcesList, this.search);
-      const r = await requestParams(getcloudServiceCatalogList);
-      this.metadataSelect = res.metadata;
-      this.madatePrice = res.metadata;
-      this.options = r.content.content;
-      this.priceall = res.content.content;
-      this.cities = res.content.content;
-    },
-    typeFun(val) {
-      if (val == 'String') return 'text';
-      if (val == 'Number') return 'number';
-      if (val == 'Select') return;
-    },
-    // 获取服务目录的id
-    checkServiceCatalog(value) {
-      this.form.catalogId = value[value.length - 1];
-      // console.log(this.form.catalogId);
-    },
-    loadNode(node, resolve) {
-      if (node.level === 0) {
-        return resolve(this.list);
+    invalid1(data) {
+      if (data == "是") {
+        this.cloudSkuFrom.costPrice +=
+          this.cpuPrice * this.cloudSkuFrom.cpuCores;
       } else {
-        getServiceSubdirectoryMessage(node.data.id).then(res => {
-          return resolve(res.content.content);
-        });
+        this.cloudSkuFrom.costPrice -=
+          this.cpuPrice * this.cloudSkuFrom.cpuCores;
       }
     },
-    getServiceId(val) {
-      getCloudResourceInfo(val).then(res => {
-        this.reservedParamers = [];
-        var object = res.content.creation.parameters;
-        for (var i = 0; i < object.length; i++) {
-          if (!object[i].reserved) {
-            this.reservedParamers.push(object[i]);
-            // console.log(this.reservedParamers);
+    invalid2(data) {
+      if (data == "是") {
+        this.cloudSkuFrom.costPrice +=
+          this.memoryPrice * this.cloudSkuFrom.memory;
+      } else {
+        this.cloudSkuFrom.costPrice -=
+          this.memoryPrice * this.cloudSkuFrom.memory;
+      }
+    },
+    invalid3(data) {
+      if (data == "是") {
+        this.cloudSkuFrom.costPrice +=
+          this.storagePrice * this.cloudSkuFrom.storage;
+      } else {
+        this.cloudSkuFrom.costPrice -=
+          this.storagePrice * this.cloudSkuFrom.storage;
+      }
+    },
+    updatePrice() {
+      this.priceCalculation();
+    },
+    resourcePrice(data) {
+      console.log(data);
+      let params = {
+        resourceCode: data,
+      };
+      getPricesList(params).then((r) => {
+        let data = r.content.content;
+        data.forEach((item, index) => {
+          switch (item.attributeName) {
+            case "CPU":
+              this.cpuPrice = item.price;
+              break;
+            case "MEMORY":
+              this.memoryPrice = item.price;
+              break;
+            case "STORAGE":
+              this.storagePrice = item.price;
+              break;
           }
-        }
-        for (var i = 0; i < this.reservedParamers.length; i++) {
-          if (this.reservedParamers[i].clazz == 'Select') {
-            this.arr = this.reservedParamers[i].defaultValue.split(',');
-            this.atest = this.arr[0];
-          }
-        }
-        console.log(this.arr);
+        });
 
-        // 遍历云资源中的deletion的parameters
-        this.reserveddeletion = [];
-        var objectdeletionparamers = res.content.deletion.parameters;
-        for (var i = 0; i < objectdeletionparamers.length; i++) {
-          if (!objectdeletionparamers[i].reserved) {
-            this.reserveddeletion.push(objectdeletionparamers[i]);
-          }
-        }
-        for (var i = 0; i < this.reserveddeletion.length; i++) {
-          if (this.reserveddeletion[i].clazz == 'Select') {
-            this.arr = this.reserveddeletion[i].defaultValue.split(',');
-            this.atest = this.arrd[0];
-          }
-        }
-        // 遍历云资源中的modification的parameters
-        this.reservedmodification = [];
-        var objectmodificationparamers = res.content.modification.parameters;
-        for (var i = 0; i < objectmodificationparamers.length; i++) {
-          if (!objectmodificationparamers[i].reserved) {
-            this.reservedmodification.push(objectmodificationparamers[i]);
-          }
-        }
-        for (var i = 0; i < this.reservedmodification.length; i++) {
-          if (this.reservedmodification[i].clazz == 'Select') {
-            this.arr = this.reservedmodification[i].defaultValue.split(',');
-            this.atest = this.arrm[0];
-          }
+        this.priceCalculation();
+      });
+    },
+    priceCalculation() {
+      this.cloudSkuFrom.costPrice =
+        this.cpuPrice * this.cloudSkuFrom.cpuCores +
+        this.memoryPrice * this.cloudSkuFrom.memory +
+        this.storagePrice * this.cloudSkuFrom.storage;
+    },
+    dialogVisible() {
+      this.$router.push({
+        path: "/operatingCentre/newServicesOperational/cloudServiceSKU",
+      });
+    },
+    handleChange(file, fileList) {
+      this.fileList = fileList.slice(-3);
+    },
+    async fetchData() {
+      this.listLoading = true;
+      const res = await requestParams(getCloudServiceList, this.search);
+      this.list = res.content.content;
+      const res1 = await requestParams(getResourcesList, this.search);
+      this.list1 = res1.content.content;
+      this.metadataSelect = res1.metadata;
+      console.log(this.list);
+      console.log(this.list1);
+      this.metadata = res.metadata;
+
+      this.listLoading = false;
+    },
+
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.createCloudService();
+        } else {
+          console.log("error submit!!");
+          return false;
         }
       });
-      for (var i = 0; i < this.cities.length; i++) {
-        if (this.cities[i].id == val) {
-          this.form.serviceId = this.cities[i].service.id;
-          break;
+    },
+    submitForm1(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.formCloud = true;
+        } else {
+          console.log("error submit!!");
+          return false;
         }
-      }
-      this.form.resourceId = val;
+      });
     },
-    selctPage(msg) {
-      this.search.page = msg;
-      this.initSelect();
-    },
-    handleRowClick(row, column, event) {
-      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
-      const index = this.expandRowKeys.indexOf(row.id);
-      if (index == -1) {
-        this.expandRowKeys.push(row.id);
-      } else {
-        this.expandRowKeys.splice(index, 1);
-      }
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-
-    getCreationVal(msg) {
-      this.form.creation = msg;
-    },
-    getM(msg, fatherId, money) {
-      this.val = msg;
-      var creat = {
-        id: 0,
-        priceId: 0,
-        skuId: 0,
-        source: '',
-        specId: 0,
-        fatherId: 0
-      };
-      var moneyObject = {
-        fatherId: 0,
-        price: 0
-      };
-      // 遍历计价
-      var resut = false;
-      var inds = 0;
-      console.log(this.dd);
-      if (this.dd.length != 0) {
-        for (var i = 0; i < this.dd.length; i++) {
-          if (this.dd[i].fatherId == fatherId) {
-            resut = true;
-            inds = i;
-          }
+    submitForm2(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.formEntry = true;
+        } else {
+          console.log("error submit!!");
+          return false;
         }
-      }
-      if (resut) {
-        this.dd.splice(inds, 1);
-        creat.fatherId = fatherId;
-        creat.specId = fatherId;
-        creat.priceId = msg;
-        this.dd.push(creat);
-      } else {
-        creat.fatherId = fatherId;
-        creat.specId = fatherId;
-        creat.priceId = msg;
-        this.dd.push(creat);
-      }
-      if (this.dd.length == 0) {
-        creat.fatherId = fatherId;
-        creat.specId = fatherId;
-        creat.priceId = msg;
-        this.dd.push(creat);
-      }
+      });
+    },
+    createCloudService() {
+      this.cloudSkuFrom.cpuCores += "C";
+      this.cloudSkuFrom.memory += "GB";
+      this.cloudSkuFrom.storage += "GB";
+      console.log(this.cloudSkuFrom);
 
-      // 遍历金额
-      var result = false;
-      var index = 0;
-      if (this.aa.length != 0) {
-        for (var i = 0; i < this.aa.length; i++) {
-          if (this.aa[i].fatherId == fatherId) {
-            result = true;
-            index = i;
-          }
+      createdSKU(this.cloudSkuFrom).then((r) => {
+        if (r.code == 201) {
+          this.$notify({
+            message: r.message,
+            type: "success",
+          });
+          this.dialogVisible();
+        } else {
+          this.$notify({
+            message: r.message,
+            type: "warning",
+          });
         }
-      }
-      if (result) {
-        this.aa.splice(index, 1);
-        moneyObject.price = money;
-        moneyObject.fatherId = fatherId;
-        this.aa.push(moneyObject);
-      } else {
-        moneyObject.price = money;
-        moneyObject.fatherId = fatherId;
-        this.aa.push(moneyObject);
-      }
-      if (this.aa.length == 0) {
-        moneyObject.fatherId = fatherId;
-        moneyObject.price = money;
-        this.aa.push(moneyObject);
-      }
-      this.sums = 0;
-      for (var i = 0; i < this.aa.length; i++) {
-        this.sums += this.aa[i].price;
-      }
-      console.log(this.sums);
+      });
     },
-    handleChange(val) {
-      if (val == 3) {
-        console.log(this.aa);
-      }
-    },
-    createResources() {
-      var space = [];
-      var sc = [];
-      this.is = true;
-      this.loading = true;
-      var data = this.form;
-      var _this = this;
-      // 遍历creation中paramers中
-      var sr = {
-        id: 0,
-        priceId: 0,
-        skuId: 0,
-        source: '',
-        specId: 0
-      };
-
-      for (var i = 0; i < this.reservedParamers.length; i++) {
-        // if (this.reservedParamers[i].clazz == "Select") {
-        //   this.arr = this.reservedParamers[i].defaultValue.split(",");
-        // }
-        //     console.log(this.arr)
-        var creatspaces = {
-          editable: true,
-          name: '',
-          paramKey: '',
-          paramValue: '',
-          skuId: 0,
-          specId: 0,
-          status: '',
-          tags: '',
-          clazz: ''
-        };
-        creatspaces.name = this.reservedParamers[i].name;
-        creatspaces.editable = this.reservedParamers[i].editable;
-        creatspaces.paramKey = this.reservedParamers[i].paramKey;
-
-        creatspaces.specId = this.reservedParamers[i].id;
-        creatspaces.clazz = this.reservedParamers[i].clazz;
-        creatspaces.paramValue = this.reservedParamers[i].defaultValue;
-        space.push(creatspaces);
-      }
-
-      data.specs = space;
-
-      // 遍历deletion中paramers中
-      for (var i = 0; i < this.reserveddeletion.length; i++) {
-        var creatspaces = {
-          editable: true,
-          name: '',
-          paramKey: '',
-          paramValue: '',
-          skuId: 0,
-          specId: 0,
-          status: '',
-          tags: '',
-          clazz: ''
-        };
-        creatspaces.name = this.reserveddeletion[i].name;
-        creatspaces.editable = this.reserveddeletion[i].editable;
-        creatspaces.paramKey = this.reserveddeletion[i].paramKey;
-        creatspaces.clazz = this.reserveddeletion[i].clazz;
-        creatspaces.paramValue = this.reserveddeletion[i].defaultValue;
-        creatspaces.specId = this.reserveddeletion[i].id;
-        space.push(creatspaces);
-      }
-      data.specs = space;
-      // this.reservedParamers.name=data.specs.name;
-      // 遍历modification中paramers中
-      for (var i = 0; i < this.reservedmodification.length; i++) {
-        var creatspaces = {
-          editable: true,
-          name: '',
-          paramKey: '',
-          paramValue: '',
-          skuId: 0,
-          specId: 0,
-          status: '',
-          tags: '',
-          clazz: ''
-        };
-        creatspaces.name = this.reservedmodification[i].name;
-        creatspaces.editable = this.reservedmodification[i].editable;
-        creatspaces.paramKey = this.reservedmodification[i].paramKey;
-        creatspaces.paramValue = this.reservedmodification[i].defaultValue;
-        creatspaces.paramValue = this.reservedmodification[i].defaultValue;
-        creatspaces.specId = this.reservedmodification[i].id;
-        space.push(creatspaces);
-      }
-      this.form.price.period = this.input3 + this.select;
-      data.specs = space;
-      data.price.price = this.sums;
-      data.price.priceItems = this.dd;
-      console.log(data);
-      setTimeout(function() {
-        createdSKU(data).then(r => {
-          console.log(data);
-          if (r.code == 201) {
-            _this.$router.push({
-              path: '/operatingCentre/serviceOperating', query: { tab: 'third' }});
-            // _this.loading = false;
-            _this.$notify({
-              type: 'success',
-              message: r.message
-            });
-          } else {
-            _this.$notify({
-              type: 'error',
-              message: r.message
-            });
-          }
-        });
-      }, 1200);
-    },
-    comeback() {
-      this.$router.push({
-        path: '/operatingCentre/serviceOperating', query: { tab: 'third' }});
-    }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
-.fontStyle {
-  font-size: 16px;
-  font-weight: 500;
+// @import "../../../rewrite.scss";
+/deep/ .el-select {
+  width: 100%;
+}
+.labelText {
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+}
+.margin-top {
+  margin-top: 20px;
+}
+.title {
+  border-left: 5px #0261a7 solid;
+  line-height: 22px;
+  margin-left: 2%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
 }
 
-/*.selectJob*/
-/*span{*/
-/*width:120px;*/
-/*overflow :hidden;*/
-/*text-overflow :ellipsis;*/
-/*white-space: nowrap;*/
-/*}*/
-.textStyle {
-  padding-left: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  color: cornflowerblue;
+.tishiText {
+  font-size: 10px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(255, 45, 37, 1);
 }
-</style>
-<style>
-.el-notification__content {
-  line-height: 12px;
+/deep/.el-input__inner {
+  height: 34px;
+}
+/deep/.el-form-item__content {
+  line-height: 42px;
+  position: relative;
+  font-size: 14px;
+}
+/deep/.el-input--mini {
+  font-size: 14px;
+}
+/deep/.el-input-number {
+  width: 100%;
+}
+.tishi {
+  font-size: 10px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(255, 45, 37, 1);
 }
 </style>

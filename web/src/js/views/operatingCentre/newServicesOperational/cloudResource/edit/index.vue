@@ -2,107 +2,163 @@
   <div>
     <el-card class="box-card">
       <div slot="header" class="clearfix" style="color:#0261a7">
-        <span>编辑云资源</span>
-        <el-button type="primary" size="mini" icon="el-icon-back" class="right" @click="dialogVisible()">返回</el-button>
+        <span>新建云资源</span>
+        <el-button
+          type="primary"
+          size="mini"
+          icon="el-icon-back"
+          class="right"
+          @click="dialogVisible()"
+        >返回</el-button>
       </div>
       <el-row>
         <el-col :span="23">
           <span class="title">基本信息</span>
         </el-col>
         <el-col>
-          <el-form ref="cloudServiceFrom" :model="cloudServiceFrom" :rules="rules" label-width="100px" label-position="left" class="margin-top">
+          <el-form
+            ref="cloudServiceFrom"
+            :model="cloudServiceFrom"
+            :rules="cloudServiceFrom"
+            label-width="100px"
+            label-position="rigth"
+            class="margin-top"
+          >
             <el-col :span="20" :offset="1">
-              <el-form-item prop="name">
-                <span slot="label" class="labelText">名称：</span>
-                <el-col :span="22">
-                  <el-input v-model="cloudServiceFrom.name" placeholder="请输入名称"/>
-                </el-col>
+              <el-form-item
+                prop="name"
+                :rules="[
+                        { required: true, message: '集群名称不能为空' },
+                           { max: 253, message: '长度最多253个字符', trigger: 'blur' },
+                        {
+                          pattern: /^[\u0391-\uFFE5_a-z0-9\.]+[\u0391-\uFFE5a-z0-9]$/,
+                          message:
+                            '名称由中文、小写字母、数字、横线(-)和点(.)组成,且必须以中文、字母或数字结尾',
+                          trigger: 'blur'
+                        }
+                      ]"
+              >
+                <span slot="label" class="labelText">集群名称：</span>
+                <el-input v-model="cloudServiceFrom.name" placeholder="请输入集群名称" />
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item>
-                <span slot="label" class="labelText">关键字:</span>
-                <el-col :span="22">
-                  <el-input v-model="cloudServiceFrom.tags" placeholder="请输入关键字"/>
-                </el-col>
+              <el-form-item prop="platform" :rules="[{ required: true, message: '集群类型不能为空' }]">
+                <span slot="label" class="labelText">集群类型：</span>
+                <el-select v-model="cloudServiceFrom.platform" placeholder="请选择集群类型">
+                  <el-option
+                    v-for="item in platforms"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item prop="description">
-                <span slot="label" class="labelText">描述:</span>
-                <el-col :span="22">
-                  <el-input v-model="cloudServiceFrom.description" placeholder="请输入描述信息"/>
-                </el-col>
+              <el-form-item
+                prop="keyword"
+                :rules="[
+                    { required: true, message: '关键字不能为空' },
+                    { max: 10, message: '长度最多10个字符', trigger: 'blur' },
+                    {
+                      pattern: /^[a-z0-9]*$/,
+                      message:
+                        '包括小写字母、数字,最长支持10个字符',
+                      trigger: 'blur'
+                    }
+                  ]"
+              >
+                <span slot="label" class="labelText">关键字：</span>
+                <el-input v-model="cloudServiceFrom.keyword" placeholder="请输入关键字" />
               </el-form-item>
             </el-col>
-          </el-form>
-        </el-col>
-        <el-col :span="23">
-          <span class="title">资源配置</span>
-        </el-col>
-        <el-col>
-          <el-form ref="entry" :model="entry" :rules="entryRules" label-width="100px" label-position="left" class="margin-top">
             <el-col :span="20" :offset="1">
-              <el-form-item prop="domain">
+              <el-form-item
+                prop="masterIp"
+                :rules="[
+                 { max: 100, message: '长度最多100个字符', trigger: 'blur' },
+                    {
+                      pattern: /^([a-zA-Z\d][a-zA-Z\d-_]+\.)+[a-zA-Z\d-_][^ ]*$/,
+                      message:
+                        '只能由字母,数字,中划线组成,中划线不能在开头或末尾,至少包含两个字符串,单个字符串不超过63个字符,字符串间以点分割,且总长度不超过100个字符。',
+                      trigger: 'blur'
+                    }
+                  ]"
+              >
                 <span slot="label" class="labelText">域名：</span>
-                <el-col :span="22">
-                  <el-input v-model="entry.domain" placeholder="请输入域名"/>
-                </el-col>
+                <el-input
+                  v-model="cloudServiceFrom.masterIp"
+                  placeholder="只能由字母,数字,中划线组成,中划线不能在开头或末尾,至少包含两个字符串,单个字符串不超过63个字符,字符串间以点分割,且总长度不超过100个字符。"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item prop="root">
-                <span slot="label" class="labelText">路径：</span>
-                <el-col :span="22">
-                  <el-input v-model="entry.root" placeholder="请输入路径"/>
-                </el-col>
-              </el-form-item>
-            </el-col>
-            <el-col :span="20" :offset="1">
-              <el-form-item prop="port">
+              <el-form-item
+                prop="port"
+                :rules="[
+                     {
+                      pattern: /^([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/g,
+                      message: '范围需为（80～65535）',
+                      trigger: 'blur'
+                    }
+                  ]"
+              >
                 <span slot="label" class="labelText">端口：</span>
-                <el-col :span="22">
-                  <el-input v-model="entry.port" placeholder="请输入端口"/>
-                </el-col>
+                <el-input type="number" v-model="cloudServiceFrom.port" placeholder="请输入端口" />
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item prop="protocol">
+              <el-form-item prop="proxy">
                 <span slot="label" class="labelText">协议类型：</span>
-                <el-col :span="22">
-                  <el-select v-model="entry.protocol" placeholder="请选择">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"/>
-                  </el-select>
-                </el-col>
+                <el-select
+                  v-model="cloudServiceFrom.proxy"
+                  placeholder="请选择协议类型"
+                  style="width:100%"
+                >
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item prop="host">
-                <span slot="label" class="labelText">主机地址：</span>
-                <el-col :span="22">
-                  <el-input v-model="entry.host" placeholder="请输入主机地址"/>
-                </el-col>
+              <el-form-item prop="token">
+                <span slot="label" class="labelText">验证信息：</span>
+                <el-input v-model="cloudServiceFrom.token"  placeholder="请输入验证信息" />
               </el-form-item>
             </el-col>
             <el-col :span="20" :offset="1">
-              <el-form-item>
-                <span slot="label" class="labelText">证书：</span>
-                <el-col :span="22">
-                  <el-input v-model="entry.isAuthRequired" style="width:90%" placeholder="请选择证书"/>
-                  <el-upload
-                    :on-change="handleChange"
-                    :file-list="fileList"
-                    style="display:inline-block"
-                    class="upload-demo"
-                    action="https://jsonplaceholder.typicode.com/posts/">
-                    <el-button size="small" type="primary" style="margin-left:15px"><i class="el-icon-upload el-icon--right"/>选择文件</el-button>
-                  </el-upload>
-
-                </el-col>
+              <el-form-item
+                prop="monitorAddress"
+                :rules="[
+                      {
+                        pattern: /^[\/]{1}([a-zA-Z0-9]|[-_*./]|[\/]){1,49}$/,
+                        message:
+                          '须以斜杠(/)开头,组成元素只能是大小写字母、数字、点(.)、中划线(-)、下划线(_)和斜杠(/),不能出现连续斜杠(//),且不能以点(.)结尾,如/api/web',
+                        trigger: 'blur'
+                      }
+                    
+                    
+                    ]"
+              >
+                <span slot="label" class="labelText">监控地址：</span>
+                <el-input
+                  v-model="cloudServiceFrom.monitorAddress"
+                  placeholder="须以斜杠(/)开头,组成元素只能是大小写字母、数字、点(.)、中划线(-)、下划线(_)和斜杠(/),不能出现连续斜杠(//),且不能以点(.)结尾,如/api/web"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="20" :offset="1">
+              <el-form-item prop="description" style="width:100%">
+                <span slot="label" class="labelText">描述：</span>
+                <el-input
+                  v-model="cloudServiceFrom.description"
+                  type="textarea"
+                />
               </el-form-item>
             </el-col>
           </el-form>
@@ -111,7 +167,7 @@
       <el-row>
         <el-col :span="4" :offset="20" style="margin-top:20px;">
           <el-button size="small" @click="dialogVisible">返回</el-button>
-          <el-button size="small" type="primary" @click="submitForm('cloudServiceFrom','entry')">确定</el-button>
+          <el-button size="small" type="primary" @click="submitForm('cloudServiceFrom')">确定</el-button>
         </el-col>
       </el-row>
     </el-card>
@@ -119,166 +175,159 @@
 </template>
 
 <script>
-import { requestParams, parseHash } from '@/utils/urlParam';
+import { requestParams, parseHash } from "@/utils/urlParam";
 import {
+  getCloudResourceInfo,
   editCloudResourceInfo,
-  getCloudResourceInfo
-} from '@/api/serviceOperating';
+} from "@/api/serviceOperating";
 
 export default {
-  filters: {
-  },
+  filters: {},
   data() {
     return {
       fileList: [],
-      options: [{
-        value: 'HTTP',
-        label: 'HTTP'
-      }],
-      entry: {
-        apiVersion: '',
-        domain: '',
-        host: '',
-        isAuthRequired: '',
-        port: '',
-        protocol: '',
-        root: '',
-        serviceId: 0
-      },
-      cloudServiceFrom: {
-        description: '',
-        entry: {
+      options: [
+        {
+          value: "HTTP",
+          label: "HTTP",
         },
-        expireTime: '',
-        icon: '',
+        {
+          value: "HTTPS",
+          label: "HTTPS",
+        },
+        {
+          value: "WEBSOCKET",
+          label: "WEBSOCKET",
+        },
+      ],
+      platforms: [
+        {
+          value: "1",
+          label: "OpenShift",
+        },
+        {
+          value: "2",
+          label: "Kubernetes",
+        },
+      ],
+      cloudServiceFrom: {
+        description: "",
+        expireTime: "",
+        icon: "",
         isPublic: true,
         isSubSupported: true,
         menderId: 0,
-        name: '',
-        namespace: '',
-        onlineTime: '',
+        name: "",
+        namespace: "",
+        onlineTime: "",
         orgId: 0,
         ownerId: 0,
-        status: '',
-        tags: '',
+        status: "",
+        keyword: "",
         tenantId: 0,
-        url: '',
-        version: ''
-      },
-      rules: {
-        name: [
-          { required: true, message: '请输入云资源名称', trigger: 'blur' },
-          { max: 253, message: '长度最多253个字符', trigger: 'blur' },
-          { pattern:
-                /^[\u0391-\uFFE5a-z0-9][\u0391-\uFFE5_a-z0-9\.]+[\u0391-\uFFE5a-z0-9]$/, message: '名称由中文、小写字母、数字、横线(-)和点(.)组成,且必须以中文、字母或数字开头结尾', trigger: 'change' }
-        ],
-        description: [
-          { pattern:
-                /^[\u0391-\uFFE5a-z0-9@"\p{P}"]+$/, message: '名称由中文、小写字母、数字和中文标点符号组成', trigger: 'change' }
-        ]
-      },
-      entryRules: {
-        domain: [
-          { pattern:
-                /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/, message: '只能由字母,数字,中划线组成,中划线不能在开头或末尾,至少包含两个字符串,单个字符串不超过63个字符,字符串间以点分割', trigger: 'change' }, { max: 100, message: '长度最多100个字符', trigger: 'blur' }
-        ],
-        root: [
-          { pattern:
-                /^\/[/0-9A-Za-z-\.]+[/0-9A-Za-z-]$/, message: '名称由中文、小写字母、数字和中文标点符号组成', trigger: 'change' }
-        ]
+        url: "",
+        version: "",
       },
       formCloud: false,
-      formEntry: false
+      formEntry: false,
     };
   },
   created() {
-    this.getData();
+    this.fetchData();
   },
   methods: {
-    getData() {
-      getCloudResourceInfo(this.$route.params.id).then(res => {
-        this.cloudServiceFrom = res.content;
-        this.entry = this.cloudServiceFrom.entry;
-        console.log(this.entry);
-      });
+    async fetchData() {
+      this.listLoading = true;
+      console.log(this.searchInput);
+      const res = await requestParams(
+        getCloudResourceInfo,
+        this.$route.params.id
+      );
+      this.cloudServiceFrom = res.content;
+      this.metadata = res.metadata;
+      this.listLoading = false;
     },
     dialogVisible() {
       this.$router.push({
-        path: '/operatingCentre/newServicesOperational/cloudResource'
+        path: "/operatingCentre/newServicesOperational/cloudResource",
       });
     },
     handleChange(file, fileList) {
       this.fileList = fileList.slice(-3);
     },
-    submitForm(cloudServiceFrom, entry) {
-      this.submitForm1(cloudServiceFrom);
-      this.submitForm2(entry);
-      if (this.formCloud && this.formEntry) {
-        this.createCloudService();
-      } else {
-        console.log('error submit!!');
-        return false;
-      }
-    },
-    submitForm1(formName) {
-      this.$refs[formName].validate(valid => {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.formCloud = true;
+          this.createCloudService();
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
       });
     },
-    submitForm2(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.formEntry = true;
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
-    },
+
     createCloudService() {
-      this.cloudServiceFrom.entry = this.entry;
-      editCloudResourceInfo(this.$route.params.id, this.cloudServiceFrom).then(r => {
-        if (r.code == 201) {
-          this.$notify({
-            message: r.message,
-            type: 'success'
-          });
-          this.dialogVisible();
-        } else {
-          this.$notify({
-            message: r.message,
-            type: 'warning'
-          });
+      console.log(this.cloudServiceFrom);
+      editCloudResourceInfo(this.$route.params.id, this.cloudServiceFrom).then(
+        (r) => {
+          if (r.code == 201) {
+            this.$notify({
+              message: r.message,
+              type: "success",
+            });
+            this.dialogVisible();
+          } else {
+            this.$notify({
+              message: r.message,
+              type: "warning",
+            });
+          }
         }
-      });
-    }
-  }
+      );
+    },
+  },
 };
 </script>
-
 <style lang="scss" scoped>
 // @import "../../../rewrite.scss";
-/deep/ .el-select{
+/deep/ .el-select {
   width: 100%;
 }
-.labelText{
-  color:#666666;
+.labelText {
   font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
 }
-.margin-top{
+.margin-top {
   margin-top: 20px;
 }
 .title {
-  border-left: 5px #0261A7 solid;
-  font-size: 14px;
-  font-weight: 900;
+  border-left: 5px #0261a7 solid;
   line-height: 22px;
   margin-left: 2%;
   padding-left: 15px;
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}
+
+.tishiText {
+  font-size: 10px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(255, 45, 37, 1);
+}
+/deep/.el-input__inner {
+  height: 34px;
+}
+/deep/.el-form-item__content {
+  line-height: 42px;
+  position: relative;
+  font-size: 14px;
+}
+/deep/.el-input--mini {
+  font-size: 14px;
 }
 </style>

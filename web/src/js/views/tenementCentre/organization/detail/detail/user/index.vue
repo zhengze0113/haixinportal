@@ -263,7 +263,6 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          alert(1);
         })
         .catch(() => {
           this.$notify({

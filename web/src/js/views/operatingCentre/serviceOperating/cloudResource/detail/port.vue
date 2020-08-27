@@ -57,7 +57,7 @@ export default {
     fetchData() {
       getCloudResourceInfo(this.$route.params.id).then(response => {
         this.list1 = response.content;
-        console.log(this.list1);
+
         // this.jsonzhuanlist(JSON.parse(response.content.creation.template), '', 'creation');
         // this.jsonzhuanlist(JSON.parse(response.content.modification.template), '', 'modification');
         // this.jsonzhuanlist(JSON.parse(response.content.deletion.template), '', 'deletion');

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-row :gutter="20" class="primaryBackground ">
+    <el-row :gutter="20" class="primaryBackground">
       <el-col :span="24" :offset="0">
         <div class="grid-content bg-purple" style="padding:10px;">
-          <el-col :span="3" style="padding:0">
+          <el-col :span="2" style="padding:0">
             <div class="left" style="margin-right:27px;">
               <el-button
                 size="small"
@@ -13,61 +13,41 @@
               >新建</el-button>
             </div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="6" :offset="7">
             <el-row class="right">
               <el-col :span="8" style="line-height:32px">云资源:</el-col>
               <el-col :span="16">
-                <el-select v-model="value" size="mini" placeholder="全部">
+                <el-select v-model="resourceId" size="mini" clearable placeholder="全部">
                   <el-option
                     v-for="item in list1"
-                    :key="item.value"
+                    :key="item.code"
                     :label="item.name"
-                    :value="item.value"
+                    :value="item.code"
                   />
                 </el-select>
               </el-col>
             </el-row>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-row class="right">
-              <el-col :span="6" style="line-height:32px">分类:</el-col>
-              <el-col :span="18">
-                <el-select v-model="value" size="mini" placeholder="全部">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
+              <el-col :span="16" style="line-height: 32px;">
+                关键字：
+                <el-input
+                  clearable
+                  v-model="searchInput"
+                  size="mini"
+                  placeholder="请输入服务编码"
+                  class="search-input"
+                />
+              </el-col>
+              <el-col :span="4">
+                <el-button size="small" @click="query()" icon="el-icon-search">查询</el-button>
+              </el-col>
+              <el-col :span="2" :offset="2">
+                <el-button type="primary" @click="reset()">重置</el-button>
               </el-col>
             </el-row>
           </el-col>
-
-          <el-col :span="7">
-            <el-row class="right">
-              <el-col :span="6" style="line-height:32px">关键字：</el-col>
-              <el-col :span="18">
-                <el-col :span="18">
-                  <el-input
-                    v-model="searchInput"
-                    size="mini"
-                    placeholder="请输入服务编码"
-                    class="search-input"
-                  />
-                </el-col>
-                <el-col :span="6">
-                  <el-button size="small" icon="el-icon-search">查询</el-button>
-                </el-col>
-              </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="2" style="padding:0">
-            <el-row class="right">
-              <el-button size="small" type="primary">重置</el-button>
-            </el-row>
-          </el-col>
-
           <el-table
             v-loading="listLoading"
             :data="list"
@@ -96,7 +76,7 @@
             </el-table-column>
             <el-table-column label="关键字" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.tags }}</span>
+                <span>{{ scope.row.keyword }}</span>
               </template>
             </el-table-column>
             <el-table-column label="服务描述" align="center" show-overflow-tooltip>
@@ -105,23 +85,9 @@
               </template>
             </el-table-column>
             <el-table-column label="云资源" align="center" show-overflow-tooltip>
-              <template slot-scope="scope">{{ scope.row.service == null ? "":scope.row.service.name }}</template>
+              <template slot-scope="scope">{{ scope.row.cloudResourceName }}</template>
             </el-table-column>
-            <!-- <el-table-column label="资源种类" align="center">
-              <template slot-scope="scope">
-                <span/>
-              </template>
-            </el-table-column>-->
-            <!-- <el-table-column label="SKU数量" align="center">
-              <template slot-scope="scope">
-                <span/>
-              </template>
-            </el-table-column>-->
-            <el-table-column label="分类" align="center">
-              <template slot-scope="scope">
-                <span>{{ scope.row.category }}</span>
-              </template>
-            </el-table-column>
+
             <el-table-column label="云产品数量" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
                 <span>{{ scope.row.skuNumber }}</span>
@@ -129,7 +95,6 @@
             </el-table-column>
             <el-table-column align="center" prop="created_at" label="创建时间" show-overflow-tooltip>
               <template slot-scope="scope">
-
                 <span>{{ scope.row.gmtCreate }}</span>
               </template>
             </el-table-column>
@@ -156,71 +121,63 @@
         <el-form
           ref="formInline"
           :model="formInline"
-          :rules="rules"
+          :rules="formInline"
           label-width="100px"
           class="demo-formInline"
         >
-          <el-form-item label="服务编码">
-            <el-input v-model="formInline.code" :disabled="true" placeholder="syj.project.s3e5ciyr"/>
+          <el-form-item label="服务编码" prop="code">
+            <el-input v-model="formInline.code" :disabled="true" placeholder="系统自动生成" />
           </el-form-item>
-          <el-form-item label="云产品名称" prop="name">
-            <el-input v-model="formInline.name" placeholder="请输入云产品名称"/>
-          </el-form-item>
-          <el-form-item label="云资源" prop="resources">
+          <el-form-item
+            label="云资源"
+            prop="resourceCode"
+            :rules="[{ required: true, message: '云资源不能为空' }]"
+          >
             <el-select
-              v-model="formInline.resources"
+              v-model="formInline.resourceCode"
               :metadata-select="metadataSelect"
               placeholder="请选择云资源"
               style="width:100%;"
-              @getServiceId="getServiceId"
-              @getCreation="selctPage"
             >
-              <el-option v-for="item in list1" :key="item.id" :value="item.name"/>
+              <el-option
+                v-for="item in list1"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              />
             </el-select>
           </el-form-item>
-          <el-form-item label="分类" prop="category">
-            <el-input v-model="formInline.category" placeholder="请输入分类"/>
+          <el-form-item
+            label="云产品名称"
+            prop="name"
+            :rules="[{ required: true, message: '云产品名称不能为空' }]"
+          >
+            <el-input v-model="formInline.name" placeholder="请输入云产品名称" />
           </el-form-item>
-          <el-form-item label="关键字" prop="tags">
+          <el-form-item
+            label="关键字"
+            prop="resourceCode"
+            :rules="[{ required: true, message: '关键字不能为空' }]"
+          >
             <el-input
-              v-model="formInline.tags"
+              v-model="formInline.keyword"
               on-keypress="return (/[a-z]/.test(String.fromCharCode(event.keyCode)))"
               placeholder="关键字必须英文小写"
             />
           </el-form-item>
-          <el-form-item label="服务描述" prop="description" style="width:100%">
+          <el-form-item
+            label="服务描述"
+            prop="description"
+            :rules="[{ required: true, message: '请填写服务描述' }]"
+            style="width:100%"
+          >
             <el-input
               v-model="formInline.description"
               type="textarea"
               placeholder="请输入描述文本（不超过50字）"
             />
           </el-form-item>
-          <!-- <el-row style="height: 110px;border-top: 1px dashed #d3d3d3;margin-top: 40px;">
-            <el-col class="strong">SKU配置情况</el-col>
-            <el-col :offset="5" :span="19">
-              暂无本 云产品(syj.project.s3e5ciyr) 的SKU配置，请到
-              <span>
-                <a
-                  href="#"
-                  style="color:#0261A7;padding-bottom:3px;border-bottom:1px solid #0261A7"
-                >云产品规格</a>
-              </span>
-              里添加
-            </el-col>
-          </el-row>
-          <el-row style="height: 110px;border-top: 1px dashed #d3d3d3;margin-top: 40px;">
-            <el-col class="strong">参数项列表</el-col>
-            <el-col :offset="5" :span="19">
-              暂无本 云产品(syj.project.s3e5ciyr) 的参数项，请到
-              <span>
-                <a
-                  href="#"
-                  style="color:#0261A7;padding-bottom:3px;border-bottom:1px solid #0261A7"
-                >参数项管理</a>
-              </span>
-              中添加
-            </el-col>
-          </el-row>-->
+
           <el-form-item
             style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
           >
@@ -235,36 +192,51 @@
         <el-form
           ref="editformInline"
           :model="editformInline"
-          :rules="rules"
+          :rules="editformInline"
           label-width="100px"
           class="demo-editformInline"
         >
-          <el-form-item label="服务编码">
+          <el-form-item label="服务编码" prop="code" :rules="[{ required: true, message: '关键字不能为空'  }]">
             <el-input
               v-model="editformInline.code"
               :disabled="true"
               placeholder="syj.project.s3e5ciyr"
             />
           </el-form-item>
-          <el-form-item label="云产品名称" prop="name">
-            <el-input v-model="editformInline.name" placeholder="请输入云产品名称"/>
-          </el-form-item>
-          <el-form-item label="云资源" prop="resources">
+          <el-form-item
+            label="云资源"
+            prop="description"
+            :rules="[{ required: true, message: '云资源不能为空'  }]"
+          >
             <el-select
-              v-model="editformInline.ServiceId"
+              disabled
+              v-model="editformInline.resourceCode"
               placeholder="请选择云资源"
               style="width:100%"
-              @getServiceId="getServiceId"
             >
-              <el-option v-for="item in list1" :key="item.name" :value="item.name" />
+              <el-option
+                v-for="item in list1"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              />
             </el-select>
           </el-form-item>
-          <el-form-item label="分类" prop="category">
-            <el-input v-model="editformInline.category" placeholder="请输入分类"/>
+          <el-form-item
+            label="云产品名称"
+            prop="name"
+            :rules="[{ required: true, message: '云产品名称不能为空'  }]"
+          >
+            <el-input v-model="editformInline.name" placeholder="请输入云产品名称" />
           </el-form-item>
-          <el-form-item label="关键字" prop="tags">
+
+          <el-form-item
+            label="关键字"
+            prop="keyword"
+            :rules="[{ required: true, message: '关键字不能为空' }]"
+          >
             <el-input
-              v-model="editformInline.tags"
+              v-model="editformInline.keyword"
               on-keypress="return (/[a-z]/.test(String.fromCharCode(event.keyCode)))"
               placeholder="关键字必须英文小写"
             />
@@ -276,32 +248,6 @@
               placeholder="请输入描述文本（不超过50字）"
             />
           </el-form-item>
-          <!-- <el-row style="height: 110px;border-top: 1px dashed #d3d3d3;margin-top: 40px;">
-            <el-col class="strong">SKU配置情况</el-col>
-            <el-col :offset="5" :span="19">
-              暂无本 云产品(syj.project.s3e5ciyr) 的SKU配置，请到
-              <span>
-                <a
-                  href="#"
-                  style="color:#0261A7;padding-bottom:3px;border-bottom:1px solid #0261A7"
-                >云产品规格</a>
-              </span>
-              里添加
-            </el-col>
-          </el-row>
-          <el-row style="height: 110px;border-top: 1px dashed #d3d3d3;margin-top: 40px;">
-            <el-col class="strong">参数项列表</el-col>
-            <el-col :offset="5" :span="19">
-              暂无本 云产品(syj.project.s3e5ciyr) 的参数项，请到
-              <span>
-                <a
-                  href="#"
-                  style="color:#0261A7;padding-bottom:3px;border-bottom:1px solid #0261A7"
-                >参数项管理</a>
-              </span>
-              中添加
-            </el-col>
-          </el-row>-->
           <el-form-item
             style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
           >
@@ -315,298 +261,88 @@
 </template>
 
 <script>
-import { requestParams, parseHash } from '@/utils/urlParam';
-import Pagination from '@/components/pagination';
+import { requestParams, parseHash } from "@/utils/urlParam";
+import Pagination from "@/components/pagination";
 import {
   createdCloudService, // 创建
   editCloudServiceFun, // 编辑
   getResourcesList, // 获取总
   deletedCloudService, // 删除
-  getCloudServiceList
-} from '@/api/serviceOperating';
+  getCloudServiceList,
+} from "@/api/serviceOperating";
 export default {
   components: {
-    Pagination
-  },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      };
-      return statusMap[status];
-    }
+    Pagination,
   },
   data() {
     return {
-      rules: {
-        code: [
-          { required: true, message: '请输入服务编码', trigger: 'blur' },
-          { pattern:
-                /^[a-z0-9]+$/, message: '编码中只能包含英文小写字母和数字', trigger: 'change' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        name: [
-          { required: true, message: '请输入云活动名称', trigger: 'blur' },
-          { pattern:
-                /^[\u0391-\uFFE5_A-Za-z0-9]+$/, message: '名称中只能包含中文，英文字母和数字及下划线', trigger: 'change' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        resources: [
-          { required: true, message: '请选择云资源名称', trigger: 'blur' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        category: [{ required: true, message: '请输入类别', trigger: 'blur' }],
-        tags: [
-          { required: true, message: '注：关键字必须英文小写', trigger: 'blur' },
-          { pattern:
-                /^[a-z]+$/, message: '名称中只能包含英文小写字母', trigger: 'change' }
-        ],
-        description: [
-          { required: true, message: '请输入描述文本', trigger: 'blur' }
-        ]
-      },
-      options: [
-        {
-          value: '选项1',
-          label: '黄金糕'
-        },
-        {
-          value: '选项2',
-          label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
-        }
-      ],
-      value: '',
+      resourceId: "",
       search: {
         page: 1,
-        rows: 10
+        rows: 10,
+        resourceCode: null,
+        keyword: "",
       },
       list: [],
       list1: [],
       editformInline: {
-        category: '',
-        service: {
-          name: ''
-        },
-        code: '',
-        creation: {
-          outputParams: '',
-          outputType: '',
-          parameters: [
-            {
-              clazz: '',
-              constraints: '',
-              defaultValue: '',
-              editable: true,
-              length: 0,
-              name: '',
-              operationId: 0,
-              paramKey: '',
-              required: true,
-              reserved: true,
-              resourceId: 0,
-              scope: '',
-              status: '',
-              tags: ''
-            }
-          ],
-          protocol: '',
-          tags: '',
-          template: '',
-          timeout: 0
-        },
-        creatorId: 0,
-        deletion: {
-          outputParams: '',
-          outputType: '',
-          parameters: [
-            {
-              clazz: '',
-              constraints: '',
-              defaultValue: '',
-              editable: true,
-              length: 0,
-              name: '',
-              operationId: 0,
-              paramKey: '',
-              required: true,
-              reserved: true,
-              resourceId: 0,
-              scope: '',
-              status: '',
-              tags: ''
-            }
-          ],
-          protocol: '',
-          tags: '',
-          template: '',
-          timeout: 0
-        },
-        description: '',
-        execution: {
-          outputParams: '',
-          outputType: '',
-          parameters: [
-            {
-              clazz: '',
-              constraints: '',
-              defaultValue: '',
-              editable: true,
-              length: 0,
-              name: '',
-              operationId: 0,
-              paramKey: '',
-              required: true,
-              reserved: true,
-              resourceId: 0,
-              scope: '',
-              status: '',
-              tags: ''
-            }
-          ],
-          protocol: '',
-          tags: '',
-          template: '',
-          timeout: 0
-        },
-        icon: '',
-        modification: {
-          outputParams: '',
-          outputType: '',
-          parameters: [
-            {
-              clazz: '',
-              constraints: '',
-              defaultValue: '',
-              editable: true,
-              length: 0,
-              name: '',
-              operationId: 0,
-              paramKey: '',
-              required: true,
-              reserved: true,
-              resourceId: 0,
-              scope: '',
-              status: '',
-              tags: ''
-            }
-          ],
-          protocol: '',
-          tags: '',
-          template: '',
-          timeout: 0
-        },
-        name: '',
-        orgId: 0,
-        serviceId: 0,
-        status: '',
-        tags: '',
-        tenantId: 0,
-        userId: 0
+        code: "",
+        resourceCode: "",
+        description: "",
+        name: "",
+        keyword: "",
       },
       formInline: {
-        category: '',
-        resources: '',
-        code: '',
-        creation: {
-          outputParams: 'string',
-          outputType: 'JSON',
-          parameters: [{}],
-          protocol: 'HTTP',
-          tags: 'string',
-          template: 'string',
-          timeout: 0
-        },
-        creatorId: 0,
-        deletion: {
-          outputParams: 'string',
-          outputType: 'JSON',
-          parameters: [],
-          protocol: 'HTTP',
-          tags: 'string',
-          template: 'string',
-          timeout: 0
-        },
-        description: '',
-        execution: {},
-        icon: 'string',
-        modification: {
-          outputParams: 'string',
-          outputType: 'JSON',
-          parameters: [
-            {
-              clazz: 'string',
-              constraints: 'string',
-              defaultValue: 'string',
-              editable: true,
-              length: 0,
-              name: 'string',
-              operationId: 0,
-              paramKey: 'string',
-              required: true,
-              reserved: true,
-              resourceId: 0,
-              scope: 'string',
-              status: 'string',
-              tags: 'string'
-            }
-          ],
-          protocol: 'HTTP',
-          tags: 'string',
-          template: 'string',
-          timeout: 0
-        },
-        name: '',
-        orgId: 0,
-        serviceId: 0,
-        status: 'CREATED',
-        tags: '',
-        tenantId: 0,
-        userId: 0
+        resourceCode: "",
+        code: "",
+        description: "",
+        name: "",
+        keyword: "",
       },
       selectRow: null,
       metadata: undefined,
       metadataSelect: undefined,
-      disabled: 'true',
+      disabled: "true",
       listLoading: true,
-      searchInput: '',
+      searchInput: "",
       expandRowKeys: [],
       editDialogFormVisible: false,
       dialogFormVisible: false,
-      dialogFormVisibleattestation: false,
-      dialogFormVisibleoutline: false,
-      dialogFormVisibledelete: false,
-      percentage: 0,
-      countA: 5,
       active: 0,
-      guanbi: false,
-      isDelete: false,
-      radioattestation: '',
-      radiodeleteCS: '',
-      radiodeleteSKU: '',
-      radiodeleteSM: '',
-      customColor: '#409eff',
-      numberSKU: 20,
-      privatelyOwned: 'YES'
     };
   },
   created() {
     this.fetchData();
   },
   methods: {
+    async query() {
+      this.listLoading = true;
+      console.log(this.resourceId);
+      this.search = {
+        page: 1,
+        rows: 10,
+        resourceCode: this.resourceId,
+        keyword: this.searchInput,
+      };
+      const res = await requestParams(getCloudServiceList, this.search);
+      this.list = res.content.content;
+      this.metadata = res.metadata;
+      this.listLoading = false;
+    },
+    async reset() {
+      this.resourceId = null;
+      this.searchInput = null;
+      this.listLoading = true;
+      this.search = {
+        page: 1,
+        rows: 10,
+      };
+      const res = await requestParams(getCloudServiceList, this.search);
+      this.list = res.content.content;
+      this.metadata = res.metadata;
+      this.listLoading = false;
+      const res1 = await requestParams(getCloudServiceList);
+    },
     async fetchData() {
       this.listLoading = true;
       const res = await requestParams(getCloudServiceList, this.search);
@@ -614,17 +350,10 @@ export default {
       const res1 = await requestParams(getResourcesList, this.search);
       this.list1 = res1.content.content;
       this.metadataSelect = res1.metadata;
-      console.log(this.list);
+      console.log(this.list1);
       this.metadata = res.metadata;
 
       this.listLoading = false;
-    },
-    getServiceId(val) {
-      this.formInline.serviceId = val;
-    },
-    selctPage(msg) {
-      this.search.page = msg;
-      this.initSelect();
     },
     // 分页
     tableChange({ page, rows }) {
@@ -633,7 +362,7 @@ export default {
       this.fetchData();
     },
     handleRowClick(row, column, event) {
-      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      if (event.target.nodeName.toLocaleLowerCase() != "div") return;
       const index = this.expandRowKeys.indexOf(row.id);
       if (index == -1) {
         this.expandRowKeys.push(row.id);
@@ -653,11 +382,11 @@ export default {
       this.$refs[formName].resetFields();
     },
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           this.createCloudResource();
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
       });
@@ -668,19 +397,19 @@ export default {
       this.loading = true;
       var data = this.formInline;
       var _this = this;
-      // console.log(data);
-      createdCloudService(data).then(res => {
+      console.log(data);
+      createdCloudService(data).then((res) => {
         if (res.code == 201) {
           this.$notify({
             message: res.message,
-            type: 'success'
+            type: "success",
           });
           this.dialogFormVisible = false;
           this.fetchData();
         } else {
           this.$notify({
             message: res.message,
-            type: 'warning'
+            type: "warning",
           });
         }
       });
@@ -692,23 +421,21 @@ export default {
       this.editDialogFormVisible = true;
       this.active = 0;
     },
-    getServiceId(val) {
-      this.formInline.serviceId = val;
-    },
+
     editCloudService() {
       editCloudServiceFun(this.editformInline.id, this.editformInline).then(
-        r => {
+        (r) => {
           if (r.code == 201) {
             this.$notify({
               message: r.message,
-              type: 'success'
+              type: "success",
             });
             this.editDialogFormVisible = false;
             this.fetchData();
           } else {
             this.$notify({
               message: r.message,
-              type: 'error'
+              type: "error",
             });
           }
         }
@@ -716,133 +443,35 @@ export default {
     },
     // 删除云资源
     deletedCloudService(id) {
-      this.$confirm('此操作将永久删除云资源, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除云资源, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          deletedCloudService(id).then(r => {
+          deletedCloudService(id).then((r) => {
             if (r.code == 200) {
               this.fetchData();
               this.$notify({
-                type: 'success',
-                message: r.message
+                type: "success",
+                message: r.message,
               });
             } else {
               this.$notify({
-                type: 'error',
-                message: r.message
+                type: "error",
+                message: r.message,
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消删除'
+            type: "info",
+            message: "已取消删除",
           });
         });
     },
-    // 批量删除云资源
-    batchDeleteCloudResoucrce() {
-      const data1 = [];
-      for (var i = 0; i < this.selectRow.length; i++) {
-        data1.push(this.selectRow[i].id);
-      }
-      this.$confirm('此操作将永久删除云资源, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          batchDeleteCloudResource(data1).then(r => {
-            if (r.code == 200) {
-              this.fetchData();
-              this.$notify({
-                type: 'success',
-                message: r.message
-              });
-            } else {
-              this.$notify({
-                type: 'error',
-                message: r.message
-              });
-            }
-          });
-        })
-        .catch(() => {
-          this.$notify({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-    },
-    customColorMethod(percentage) {
-      if (percentage < 30) {
-        return '#909399';
-      } else if (percentage < 70) {
-        return '#e6a23c';
-      } else {
-        return '#67c23a';
-      }
-    },
-    increase() {
-      const count = setInterval(() => {
-        this.percentage++;
-        if (this.percentage == 100) {
-          this.percentage = 0;
-          this.isDelete = false;
-          this.guanbi = true;
-          clearInterval(count);
-          this.close();
-        }
-      }, 100);
-    },
-    close() {
-      const counta = setInterval(() => {
-        this.countA--;
-        if (this.countA == 0) {
-          clearInterval(counta);
-          this.guanbi = false;
-          this.dialogFormVisibleoutline = false;
-          this.dialogFormVisibledelete = fasle;
-          this.countA = 5;
-        }
-      }, 1000);
-    }
-    // online() {
-    //   this.$confirm('此操作将上线该服务, 是否继续?', '提示', {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   })
-    //     .then(() => {
-    //       this.$notify({
-    //         type: 'success',
-    //         message: '上线成功!'
-    //       });
-    //     })
-    //     .catch(() => {
-    //       this.$notify({
-    //         type: 'info',
-    //         message: '已取消上线'
-    //       });
-    //     });
-    // },
-    // next() {
-    //   if (this.active++ > 2) this.active = 0;
-    // },
-    // last() {
-    //   if (this.active-- < 0) this.active = 0;
-    // },
-    // over() {
-    //   this.active = 3;
-    //   const o = setTimeout(() => {
-    //     this.active = 0;
-    //   }, 1000);
-    // }
-  }
+  },
 };
 </script>
 
@@ -859,8 +488,7 @@ export default {
   }
 }
 /deep/ .el-input {
-    font-size: 12px;
-
+  font-size: 12px;
 }
 .primaryBackground {
   background: #ffffff;

@@ -15,54 +15,46 @@
           >
             <el-table-column label="参数列表编码" align="center" fixed="left">
               <template slot-scope="scope">
-                <!-- <router-link
-                  :to="{path: '/operatingCentre/serviceOperating/cloudResource/detail/'+scope.row.id}"
-                  class="link"
-                >{{ scope.row.name }}</router-link> -->
-                <span>{{ scope.row.name }}</span>
+                <span>{{ scope.row.code }}</span>
               </template>
             </el-table-column>
 
             <el-table-column label="云产品" width="100" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.description }}</span>
+                <span>{{ scope.row.serviceName }}</span>
               </template>
             </el-table-column>
             <el-table-column label="云资源" width="100" align="center" show-overflow-tooltip>
-              <template slot-scope="scope">{{ scope.row.code }}</template>
+              <template slot-scope="scope">{{ scope.row.resourceName }}</template>
             </el-table-column>
             <el-table-column label="参数名称" width="80" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.price }}</span>
+                <span>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column label="参数项" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.initStock }}</span>
+                <span>{{ scope.row.paramName }}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="created_at" label="参数类型">
+            <el-table-column align="center" prop="type" label="参数类型">
               <template slot-scope="scope">
-
-                <span>{{ scope.row.gmtCreate }}</span>
+                <span>{{ scope.row.type }}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="created_at" label="默认值">
+            <el-table-column align="center" prop="defaultValue" label="默认值">
               <template slot-scope="scope">
-
-                <span>{{ scope.row.gmtCreate }}</span>
+                <span>{{ scope.row.defaultValue }}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="created_at" label="必填项">
+            <el-table-column align="center" prop="isRequired" label="必填项">
               <template slot-scope="scope">
-
-                <span>{{ scope.row.gmtCreate }}</span>
+                <span>{{ scope.row.isRequired ? "是":"否" }}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="created_at" label="约束条件说明">
+            <el-table-column align="center" prop="checkRule" label="约束条件说明">
               <template slot-scope="scope">
-
-                <span>{{ scope.row.gmtCreate }}</span>
+                <span>{{ scope.row.checkRule }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -75,23 +67,28 @@
 
 <script>
 // import {Servelist} from "@/api/table";
-import Pagination from '@/components/pagination';
-import { getSKUList, deleteSKU, batchDeletesku, queryByIdCloudServiceParams } from '@/api/serviceOperating'; // deleteSKU,skudelete
-import { requestParams, parseHash } from '@/utils/urlParam';
+import Pagination from "@/components/pagination";
+import {
+  getSKUList,
+  deleteSKU,
+  batchDeletesku,
+  queryByIdCloudServiceParams,
+} from "@/api/serviceOperating"; // deleteSKU,skudelete
+import { requestParams, parseHash } from "@/utils/urlParam";
 
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
+        published: "success",
+        draft: "gray",
+        deleted: "danger",
       };
       return statusMap[status];
-    }
+    },
   },
   data() {
     return {
@@ -101,11 +98,11 @@ export default {
       search: {
         page: 1,
         rows: 10,
-        params: '[{"param":{"resourceId":1},"sign":"EQ"}]'
+        params: '[{"param":{"resourceId":1},"sign":"EQ"}]',
       },
       patchDeleted: null,
       metadata: undefined,
-      searchInput: '',
+      searchInput: "",
       expandRowKeys: [],
       dialogFormVisible: false,
       dialogFormVisibleattestation: false,
@@ -116,24 +113,24 @@ export default {
       active: 0,
       guanbi: false,
       isDelete: false,
-      radioattestation: '',
-      radiodeleteCS: '',
-      radiodeleteSKU: '',
-      radiodeleteSM: '',
-      customColor: '#409eff',
-      category: '个人',
+      radioattestation: "",
+      radiodeleteCS: "",
+      radiodeleteSKU: "",
+      radiodeleteSM: "",
+      customColor: "#409eff",
+      category: "个人",
       numberSKU: 20,
-      privatelyOwned: 'YES',
+      privatelyOwned: "YES",
 
       form: {
-        name: '',
-        namespace: '',
-        onlineTime: '',
-        expireTIme: '',
-        url: '',
-        value1: '',
-        value2: ''
-      }
+        name: "",
+        namespace: "",
+        onlineTime: "",
+        expireTIme: "",
+        url: "",
+        value1: "",
+        value2: "",
+      },
     };
   },
   created() {
@@ -142,29 +139,42 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log('submit!');
+      console.log("submit!");
     },
     // 获取云资源下的sku
     async fetchData() {
       this.listLoading = true;
       // this.search.params = `[{"param":{"resourceId":${this.$route.params.id}},"sign":"EQ"}]`;
       // const res = await requestParams(getSKUList, this.search);
-      await queryByIdCloudServiceParams(this.$route.params.id, this.search).then(res => {
-        this.list = res.content.content;
+      await queryByIdCloudServiceParams(
+        this.$route.params.id,
+        this.search
+      ).then((res) => {
+        if (res.code == 200) {
+          res.content.forEach((element) => {
+            if (element.status == "PUBLISH") {
+              this.list = element.cloudParametersPar;
+              this.list.forEach((item) => {
+                item.code = element.code;
+                item.serviceName = element.serviceName;
+                item.resourceName = element.resourceName;
+              });
+            }
+          });
+        }
       });
 
-      // this.list = null;
+      console.log(this.list);
       this.listLoading = false;
     },
-    handleClick(row) {
-    },
+    handleClick(row) {},
     customColorMethod(percentage) {
       if (percentage < 30) {
-        return '#909399';
+        return "#909399";
       } else if (percentage < 70) {
-        return '#e6a23c';
+        return "#e6a23c";
       } else {
-        return '#67c23a';
+        return "#67c23a";
       }
     },
     increase() {
@@ -192,21 +202,21 @@ export default {
       }, 1000);
     },
     online() {
-      this.$confirm('此操作将上线该服务, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将上线该服务, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
           this.$notify({
-            type: 'success',
-            message: '上线成功!'
+            type: "success",
+            message: "上线成功!",
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消上线'
+            type: "info",
+            message: "已取消上线",
           });
         });
     },
@@ -221,8 +231,8 @@ export default {
       const o = setTimeout(() => {
         this.active = 0;
       }, 1000);
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -8,13 +8,12 @@
               <p class="head-title">服务详情</p>
             </el-col>
             <div class="right">
-              <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="jump()">
-                返回</el-button>
+              <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="jump()">返回</el-button>
             </div>
           </el-col>
         </el-col>
-        <el-col :span="24" style="border-bottom:1px solid rgba(224,224,224,1);padding:0px;"/>
-        <el-col :span="24" >
+        <el-col :span="24" style="border-bottom:1px solid rgba(224,224,224,1);padding:0px;" />
+        <el-col :span="24">
           <template>
             <el-tabs ref="tab" v-model="activeName" type="card" style="margin-top:22px;">
               <el-tab-pane label="基本信息" name="first">
@@ -24,26 +23,28 @@
                 <ResourcesSKU />
               </el-tab-pane>
               <el-tab-pane label="参数项" name="third">
-                <Parameter/>
+                <Parameter />
               </el-tab-pane>
             </el-tabs>
           </template>
         </el-col>
       </el-row>
     </el-col>
-
   </div>
 </template>
 <script>
-import { getCloudResourceInfo, queryByIdCloudServiceFun } from '@/api/serviceOperating';
-import Pagination from '@/components/pagination';
-import CloseCard from '@/components/CloseCard';
+import {
+  getCloudResourceInfo,
+  queryByIdCloudServiceFun,
+} from "@/api/serviceOperating";
+import Pagination from "@/components/pagination";
+import CloseCard from "@/components/CloseCard";
 
-import MeasuringBilling from '../../measuringBilling/index/index';
-import Port from './port';
-import Parameter from './parameter';
-import ResourcesSKU from './resourcesSKU';
-import { requestParams, parseHash } from '@/utils/urlParam';
+import MeasuringBilling from "../../measuringBilling/index/index";
+import Port from "./port";
+import Parameter from "./parameter";
+import ResourcesSKU from "./resourcesSKU";
+import { requestParams, parseHash } from "@/utils/urlParam";
 export default {
   components: {
     Pagination,
@@ -52,33 +53,29 @@ export default {
     MeasuringBilling,
     Port,
     Parameter,
-    ResourcesSKU
+    ResourcesSKU,
   },
 
   data() {
     return {
-      list: {},
       expandRowKeys: [],
       listLoading: true,
       testList: null,
       dialogVisible: false,
-      formLabelWidth: '120px',
-      searchInput: '',
-      textarea: '',
+      formLabelWidth: "120px",
+      searchInput: "",
+      textarea: "",
       defaultProps: {
-        children: 'children',
-        label: 'label'
+        children: "children",
+        label: "label",
       },
       batchDeletedObject: null,
       organizationObject: null,
-      activeName: 'first',
+      activeName: "first",
       addRelationFrom: {
-        operatingName: '',
-        userName: ''
+        operatingName: "",
+        userName: "",
       },
-      cloudService: {
-
-      }
     };
   },
   created() {
@@ -87,41 +84,37 @@ export default {
   methods: {
     // 获取云资源信息
     async fetchData() {
-      const res = await requestParams(getCloudResourceInfo, this.$route.params.id);
-      this.list = res.content;
-      const res1 = await requestParams(queryByIdCloudServiceFun, this.list.serviceId);
-      this.cloudService = res1.content;
+     
     },
     jump() {
-      location.href = '/#/operatingCentre/newServicesOperational/cloudService';
-    }
-  }
+      location.href = "/#/operatingCentre/newServicesOperational/cloudService";
+    },
+  },
 };
 </script>
 <style scope lang="scss">
 @import "../../../index.scss";
 .el-form-item__label {
-    font-size:12px;
-font-family:Microsoft YaHei;
-font-weight:400;
-color:rgba(102,102,102,1);
+  font-size: 12px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
 }
 </style>
 <style>
-
 .population {
   background: #fff;
   padding: 10px;
   margin: 0px !important;
 }
- .head-title{
-  font-size:14px;
-  font-family:Microsoft YaHei;
-  font-weight:400;
-  color:rgba(2,97,167,1);
-  line-height:60px;
- }
-  .el-notification__content{
+.head-title {
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(2, 97, 167, 1);
+  line-height: 60px;
+}
+.el-notification__content {
   line-height: 12px;
 }
 .details-left {

@@ -5,7 +5,7 @@
         <div class="grid-content bg-purple">
           <el-table
             v-loading="listLoading"
-            :data="li"
+            :data="list"
             :expand-row-keys="expandRowKeys"
             size="small"
             element-loading-text="Loading"
@@ -15,137 +15,63 @@
             @row-click="handleRowClick"
           >
             <el-table-column label="时间" align="center" fixed="left">
-              <template slot-scope="scope">
-
-                {{ scope.row.name }}
-              </template>
+              <template slot-scope="scope">{{ scope.row.gmtCreate }}</template>
             </el-table-column>
             <el-table-column label="操作内容" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.paramKey }}</span>
+                <span>{{ scope.row.content }}</span>
               </template>
             </el-table-column>
 
             <el-table-column label="版本" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.tags }}</span>
+                <span>{{ scope.row.version }}</span>
               </template>
             </el-table-column>
             <el-table-column label="更新人" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.gmtCreate }}</span>
+                <span>{{ scope.row.modifyId }}</span>
               </template>
             </el-table-column>
           </el-table>
-          <!-- <pagination :tableChange="tableChange" /> -->
         </div>
       </el-col>
     </el-row>
   </div>
 </template>
 <script>
-// import { Servelist } from "@/api/table";
-// import Pagination from "@/components/pagination";
-import { getResourcesSkuInfo, addSKUspace, getskuspecs, editskuspace, deleteskuspace } from '@/api/serviceOperating';
-import { requestParams, parseHash } from '@/utils/urlParam';
+import { getSkuHistory } from "@/api/serviceOperating";
+import { requestParams, parseHash } from "@/utils/urlParam";
 export default {
-  // components: {
-  //   Pagination
-  // },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      };
-      return statusMap[status];
-    }
-  },
   data() {
     return {
-      dialogFormVisibleUpdate: false,
-      labelPosition: 'right',
-      li: [],
-      list:
-        {
-          editable: true,
-          name: '',
-          paramKey: '',
-          paramValue: '',
-          skuId: 0,
-          specId: 0,
-          status: '',
-          tags: ''
-        },
-      formLabelAlignUpdate: {
-        editable: true,
-        name: '',
-        paramKey: '',
-        paramValue: '',
-        skuId: 0,
-        specId: 0,
-        status: '',
-        tags: ''
-      },
+      list: [],
       listLoading: true,
-      searchInput: '',
       expandRowKeys: [],
-      dialogVisible: false,
-      dialogFormVisible: false,
-      dialogFormVisibleattestation: false,
-      dialogFormVisibleoutline: false,
-      dialogFormVisibledelete: false,
-      percentage: 0,
-      countA: 5,
-      active: 0,
-      guanbi: false,
-      isDelete: false,
-      radioattestation: '',
-      radiodeleteCS: '',
-      radiodeleteSKU: '',
-      radiodeleteSM: '',
-      customColor: '#409eff',
-      category: '个人',
-      numberSKU: 20,
-      privatelyOwned: 'YES',
-      data: [],
-      value: [1, 2, 3],
-      listspace: []
     };
   },
   created() {
     this.fetchData();
   },
   methods: {
-    onSubmit() {
-      console.log('submit!');
-    },
     async fetchData() {
       this.listLoading = true;
       // 获取单个sku信息
-      const res = await requestParams(
-        getResourcesSkuInfo,
-        this.$route.params.id
-      );
-
+      const res = await requestParams(getSkuHistory, this.$route.params.id);
+      this.list = res.content.content;
       this.listLoading = false;
     },
 
-    tableChange(pagination) {
-      this.fetchData();
-    },
     handleRowClick(row, column, event) {
-      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      if (event.target.nodeName.toLocaleLowerCase() != "div") return;
       const index = this.expandRowKeys.indexOf(row.id);
       if (index == -1) {
         this.expandRowKeys.push(row.id);
       } else {
         this.expandRowKeys.splice(index, 1);
       }
-    }
-
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -191,9 +117,8 @@ export default {
   line-height: 12px;
 }
 .search-input[data-v-7d4cba30] {
-    width: 150px;
-    margin-right: 10px;
-    margin-left:10px;
+  width: 150px;
+  margin-right: 10px;
+  margin-left: 10px;
 }
-
 </style>

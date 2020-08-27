@@ -23,10 +23,7 @@ import {
   getcloudServiceCatalogList,
   getServiceSubdirectoryMessage,
 } from "@/api/serviceOperating";
-import {
-  getServicecatalogs,
-  getcloudproduct
-} from "@/api/serviceOperatingcms";
+import { getServicecatalogs, getcloudproduct } from "@/api/serviceOperatingcms";
 import { getUserInfo } from "@/utils/auth";
 import { requestParams, parseHash } from "@/utils/urlParam";
 import menuList from "./menuList";
@@ -36,7 +33,7 @@ export default {
     menuItem,
     menuList,
   },
-  data: function() {
+  data: function () {
     return {
       navMenuConfig: navMenuConfig,
       timer: [],
@@ -51,7 +48,7 @@ export default {
       this.activateMenu();
     },
   },
-  mounted: function() {
+  mounted: function () {
     this.activateMenu();
   },
   created() {
@@ -82,12 +79,15 @@ export default {
     this.clooudService();
   },
   methods: {
-    async clooudService() {
+    clooudService() {
       this.navMenuConfig[0].children = [];
 
       const params = { parentId: 0, _sort: "sort:asc" };
-      const res = await requestParams(getServicecatalogs, params);
-      this.list = res;
+      getServicecatalogs(params).then((res) => {
+        this.list = res;
+      });
+      // const res = await requestParams(getServicecatalogs, params);
+
       for (var i = 0; i < this.list.length; i++) {
         var child = {
           menuTxt: this.list[i].name,
@@ -97,10 +97,13 @@ export default {
         var params1 = {
           servicecatalog_id: this.list[i].id,
         };
-        const res1 = await requestParams(getcloudproduct, params1);
+        // const res1 = await requestParams(getcloudproduct, params1);
+        getcloudproduct(params1).then((res1) => {
+          this.list1 = res1;
+        });
 
-        this.list1 = res1;
-        console.log(this.list1);
+        // this.list1 = res1;
+
         for (var j = 0; j < this.list1.length; j++) {
           if (!this.list1[j].is_putaway) {
             break;
@@ -114,34 +117,10 @@ export default {
         }
         this.navMenuConfig[0].children.push(child);
       }
-
-      // const res = await requestParams(getcloudServiceCatalogList);
-      // this.list = res.content.content;
-      // const url = baseURL.portalPath;
-      // for (var i = 0; i < this.list.length; i++) {
-      //   var child = {
-      //     menuTxt: this.list[i].name,
-      //     children: [],
-      //   };
-
-      //   const res1 = await requestParams(
-      //     getServiceSubdirectoryMessage,
-      //     this.list[i].id
-      //   );
-      //   this.list1 = res1.content.content;
-      //   for (var j = 0; j < this.list1.length; j++) {
-      //     var childs = {
-      //       menuTxt: null,
-      //       link: `${url}/html/productDetail1.html?id=${this.list1[j].id}&productName=${this.list1[j].name}&catalogId=${this.list[i].id}&catalog=${this.list[i].name}`,
-      //     };
-      //     childs.menuTxt = this.list1[j].name;
-      //     child.children.push(childs);
-      //   }
-
-      //   this.navMenuConfig[0].children.push(child);
-      // }
-    },
-    activateMenu: function() {
+    },   
+  
+ 
+    activateMenu: function () {
       const { category } = this.$router.history.current.meta;
       const index = this.navMenuConfig.findIndex(
         (m) => m.category === category
@@ -150,13 +129,13 @@ export default {
       index >= 0 && (this.navMenuConfig[index].active = true);
       this.$forceUpdate();
     },
-    mouseenter: function(index) {
+    mouseenter: function (index) {
       if (this.$refs.subMenu[index]) {
         this.timer[index] && clearInterval(this.timer[index]);
         this.$refs.subMenu[index].$el.classList.add("show-submenu");
       }
     },
-    mouseleave: function(index) {
+    mouseleave: function (index) {
       this.timer[index] && clearInterval(this.timer[index]);
       this.timer[index] = setTimeout(() => {
         this.$refs.subMenu[index].$el.classList.remove("show-submenu");

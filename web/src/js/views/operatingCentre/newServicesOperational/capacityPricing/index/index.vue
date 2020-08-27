@@ -3,69 +3,44 @@
     <el-row :gutter="20">
       <el-col :span="24" :offset="0">
         <div class="grid-content bg-purple" style="background-color:#fff;padding:10px;">
-          <el-col :span="9" style="padding:0">
+          <el-col :span="3" style="padding:0">
             <div class="left" style="margin-right:27px;">
-              <el-button
-                size="small"
-                icon="el-icon-plus"
-                type="primary"
-                @click="dialogFormVisible = true"
-              >新建</el-button>
+              <el-button size="small" icon="el-icon-plus" type="primary" @click="addCapacity()">新建</el-button>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="5" :offset="5">
             <el-row class="right">
-              <el-col :span="6" style="line-height:32px">云资源:</el-col>
-              <el-col :span="18">
-                <el-select v-model="value" size="mini" placeholder="全部">
+              <el-col :span="8" style="line-height:32px">云资源:</el-col>
+              <el-col :span="16">
+                <el-select v-model="resourceId" placeholder="请选择云资源">
                   <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in list1"
+                    :key="item.code"
+                    :label="item.name"
+                    :value="item.code"
                   />
                 </el-select>
               </el-col>
             </el-row>
           </el-col>
-
-          <el-col :span="4" :offset="1">
-            <el-row class="right">
-              <el-col :span="6" style="line-height:32px">分类:</el-col>
-              <el-col :span="18">
-                <el-select v-model="value" size="mini" placeholder="全部">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
+          <el-col :span="10" style="padding-right: 10px;">
+            <el-col :span="6" style="line-height:32px;text-align: right;">关键字：</el-col>
+            <el-col :span="18">
+              <el-col :span="14" style="padding:0">
+                <el-input
+                  v-model="searchInput"
+                  size="mini"
+                  placeholder="请输入服务编码"
+                  class="search-input"
+                />
               </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="5">
-            <el-row class="right">
-              <el-col :span="6" style="line-height:32px">关键字：</el-col>
-              <el-col :span="18">
-                <el-col :span="18">
-                  <el-input
-                    v-model="searchInput"
-                    size="mini"
-                    placeholder="请输入服务编码"
-                    class="search-input"
-                  />
-                </el-col>
-                <el-col :span="6">
-                  <el-button size="small" icon="el-icon-search">查询</el-button>
-                </el-col>
+              <el-col :span="4">
+                <el-button size="small" @click="query()" icon="el-icon-search">查询</el-button>
               </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="1" style="padding:0">
-            <el-row class="right">
-              <el-button size="small" type="primary">重置</el-button>
-            </el-row>
+              <el-col :span="4" :offset="2">
+                <el-button type="primary" @click="reset()">重置</el-button>
+              </el-col>
+            </el-col>
           </el-col>
           <el-table
             v-loading="listLoading"
@@ -91,7 +66,7 @@
             </el-table-column>
             <el-table-column label="关键字" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.tags }}</span>
+                <span>{{ scope.row.keyword }}</span>
               </template>
             </el-table-column>
             <el-table-column label="单位" align="center" show-overflow-tooltip>
@@ -111,7 +86,7 @@
             </el-table-column>
             <el-table-column label="云资源" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.service == null ? "":scope.row.service.name }}</span>
+                <span>{{ scope.row.cloudResourceName}}</span>
               </template>
             </el-table-column>
             <el-table-column label="版本" align="center">
@@ -174,7 +149,7 @@
             <el-form-item label="云资源：" prop="resources">
               <div class="input1">
                 <el-select v-model="pricingFrom.resources" placeholder="请选择云资源">
-                  <el-option v-for="item in list1" :key="item.id" :value="item.name"/>
+                  <el-option v-for="item in list1" :key="item.id" :value="item.name" />
                 </el-select>
               </div>
             </el-form-item>
@@ -184,7 +159,7 @@
           <el-col :span="12">
             <el-form-item label="属性名称：" prop="name">
               <div class="input1">
-                <el-input v-model="pricingFrom.name" placeholder="请输入属性名称"/>
+                <el-input v-model="pricingFrom.name" placeholder="请输入属性名称" />
               </div>
             </el-form-item>
           </el-col>
@@ -192,14 +167,14 @@
             <el-form-item label="单位：" prop="unit">
               <div class="input1">
                 <el-select v-model="pricingFrom.unit">
-                  <el-option v-for="item in list" :key="item.id" :value="item.unit"/>
+                  <el-option v-for="item in list" :key="item.id" :value="item.unit" />
                 </el-select>
               </div>
             </el-form-item>
           </el-col>
         </el-col>
         <el-form-item label="资源单价：" prop="price">
-          <el-input v-model="pricingFrom.price" placeholder="0.00" style="width:450px"/>
+          <el-input v-model="pricingFrom.price" placeholder="0.00" style="width:450px" />
         </el-form-item>
         <el-form-item label="关键字：" prop="tags">
           <el-input
@@ -253,7 +228,7 @@
             <el-form-item label="云资源：" prop="resources">
               <div class="input1">
                 <el-select v-model="updataPrice.resources" placeholder="请选择云资源">
-                  <el-option v-for="item in list1" :key="item.id" :value="item.name"/>
+                  <el-option v-for="item in list1" :key="item.id" :value="item.name" />
                 </el-select>
               </div>
             </el-form-item>
@@ -263,7 +238,7 @@
           <el-col :span="12">
             <el-form-item label="属性名称：" prop="name">
               <div class="input1">
-                <el-input v-model="pricingFrom.name" placeholder="请输入属性名称"/>
+                <el-input v-model="pricingFrom.name" placeholder="请输入属性名称" />
               </div>
             </el-form-item>
           </el-col>
@@ -271,7 +246,7 @@
             <el-form-item label="单位：" prop="unit">
               <div class="input1">
                 <el-select v-model="updataPrice.unit">
-                  <el-option v-for="item in list" :key="item.id" :value="item.unit"/>
+                  <el-option v-for="item in list" :key="item.id" :value="item.unit" />
                 </el-select>
               </div>
             </el-form-item>
@@ -279,7 +254,7 @@
         </el-col>
 
         <el-form-item label="资源单价：" prop="price">
-          <el-input v-model="updataPrice.price" placeholder="0.00" style="width:450px"/>
+          <el-input v-model="updataPrice.price" placeholder="0.00" style="width:450px" />
         </el-form-item>
         <el-form-item label="关键字：" prop="tags">
           <el-input
@@ -311,75 +286,58 @@
 </template>
 
 <script>
-import Pagination from '@/components/pagination';
-import { requestParams, parseHash } from '@/utils/urlParam';
+import Pagination from "@/components/pagination";
+import { requestParams, parseHash } from "@/utils/urlParam";
 import {
   getPricesList,
   createdPrices,
   deletePrices,
   batchDeletePrices,
   postPrices,
-  getResourcesList
-} from '@/api/serviceOperating';
+  getResourcesList,
+} from "@/api/serviceOperating";
 
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
+        published: "success",
+        draft: "gray",
+        deleted: "danger",
       };
       return statusMap[status];
-    }
+    },
   },
   data() {
     return {
       rules: {
         resources: [
-          { required: true, message: '请选择云资源名称', trigger: 'blur' }
+          { required: true, message: "请选择云资源名称", trigger: "blur" },
           // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
-        name: [{ required: true, message: '请选择属性', trigger: 'blur' }],
-        unit: [{ required: true, message: '请选择单位', trigger: 'blur' }],
-        price: [{ required: true, message: '请输入资源单价', trigger: 'blur' }],
+        name: [{ required: true, message: "请选择属性", trigger: "blur" }],
+        unit: [{ required: true, message: "请选择单位", trigger: "blur" }],
+        price: [{ required: true, message: "请输入资源单价", trigger: "blur" }],
         tags: [
-          { required: true, message: '注：关键字必须英文小写', trigger: 'blur' }
+          {
+            required: true,
+            message: "注：关键字必须英文小写",
+            trigger: "blur",
+          },
         ],
         description: [
-          { required: true, message: '请输入描述文本', trigger: 'blur' }
-        ]
+          { required: true, message: "请输入描述文本", trigger: "blur" },
+        ],
       },
       list: [],
       list1: [],
       disabled: true,
       listLoading: true,
-      searchInput: '',
-      options: [
-        {
-          value: '选项1',
-          label: '黄金糕'
-        },
-        {
-          value: '选项2',
-          label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
-        }
-      ],
+      searchInput: null,
+      options: [],
       expandRowKeys: [],
       dialogFormVisible: false,
       dialogFormVisibleattestation: false,
@@ -391,41 +349,42 @@ export default {
       active: 0,
       guanbi: false,
       isDelete: false,
-      radioattestation: '',
-      radiodeleteCS: '',
-      radiodeleteSKU: '',
-      radiodeleteSM: '',
-      customColor: '#409eff',
-      category: '个人',
+      radioattestation: "",
+      radiodeleteCS: "",
+      radiodeleteSKU: "",
+      radiodeleteSM: "",
+      customColor: "#409eff",
+      category: "个人",
       numberSKU: 20,
-      privatelyOwned: 'YES',
+      privatelyOwned: "YES",
       batchDeleted: null,
       metadata: undefined,
       search: { page: 1, rows: 10 }, // 搜索参数
       pricingFrom: {
-        code: '',
-        name: '',
+        code: "",
+        name: "",
         period: 0,
-        price: '',
+        price: "",
         quota: 0,
-        status: '',
-        tags: '',
-        unit: ''
+        status: "",
+        tags: "",
+        unit: "",
         // usage: 0
       },
+      resourceId: null,
       updataPrice: {
-        name: '',
-        period: '',
-        price: '',
-        quota: '',
-        status: '',
-        tags: '',
-        unit: '',
-        resources: '',
-        code: '',
-        description: ''
+        name: "",
+        period: "",
+        price: "",
+        quota: "",
+        status: "",
+        tags: "",
+        unit: "",
+        resources: "",
+        code: "",
+        description: "",
         // used: 0
-      }
+      },
     };
   },
   created() {
@@ -433,8 +392,43 @@ export default {
     this.fetchData();
   },
   methods: {
+    addCapacity() {
+      this.$router.push({
+        path: "/operatingCentre/newServicesOperational/capacityPricing/add",
+      });
+    },
     onSubmit() {
-      console.log('submit!');
+      console.log("submit!");
+    },
+    async reset() {
+      this.resourceId = null;
+      this.searchInput = null;
+      this.listLoading = true;
+      this.search = {
+        page: 1,
+        rows: 10,
+        resourceCode: this.resourceId,
+        keyword: this.searchInput,
+      };
+      const res = await requestParams(getPricesList, this.search);
+      this.list = res.content.content;
+      this.metadata = res.metadata;
+      const res1 = await requestParams(getPricesList);
+      this.listLoading = false;
+    },
+    async query() {
+      this.listLoading = true;
+      this.search = {
+        page: 1,
+        rows: 10,
+        resourceCode: this.resourceId,
+        keyword: this.searchInput,
+      };
+      const res = await requestParams(getPricesList, this.search);
+      this.list = res.content.content;
+      this.metadata = res.metadata;
+      const res1 = await requestParams(getPricesList);
+      this.listLoading = false;
     },
     async fetchData() {
       this.listLoading = true;
@@ -445,12 +439,12 @@ export default {
       this.list1 = res1.content.content;
 
       for (var i = 0; i < this.list.length; i++) {
-        if (this.list[i].period == 'DAY') {
-          this.list[i].period = '日';
-        } else if (this.list[i].period == 'MONTH') {
-          this.list[i].period = '月';
-        } else if (this.list[i].period == 'YEAR') {
-          this.list[i].period = '年';
+        if (this.list[i].period == "DAY") {
+          this.list[i].period = "日";
+        } else if (this.list[i].period == "MONTH") {
+          this.list[i].period = "月";
+        } else if (this.list[i].period == "YEAR") {
+          this.list[i].period = "年";
         }
       }
 
@@ -462,7 +456,7 @@ export default {
       this.fetchData();
     },
     handleRowClick(row, column, event) {
-      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      if (event.target.nodeName.toLocaleLowerCase() != "div") return;
       const index = this.expandRowKeys.indexOf(row.id);
       if (index == -1) {
         this.expandRowKeys.push(row.id);
@@ -475,11 +469,11 @@ export default {
     },
     customColorMethod(percentage) {
       if (percentage < 30) {
-        return '#909399';
+        return "#909399";
       } else if (percentage < 70) {
-        return '#e6a23c';
+        return "#e6a23c";
       } else {
-        return '#67c23a';
+        return "#67c23a";
       }
     },
     increase() {
@@ -507,21 +501,21 @@ export default {
       }, 1000);
     },
     online() {
-      this.$confirm('此操作将上线该服务, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将上线该服务, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
           this.$notify({
-            type: 'success',
-            message: '上线成功!'
+            type: "success",
+            message: "上线成功!",
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消上线'
+            type: "info",
+            message: "已取消上线",
           });
         });
     },
@@ -551,67 +545,70 @@ export default {
       this.$refs[formName].resetFields();
     },
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           this.createdPricing();
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
       });
     },
     // 创建容量定价
     createdPricing() {
-      createdPrices(this.pricingFrom).then(r => {
+      createdPrices(this.pricingFrom).then((r) => {
         if (r.code == 200) {
           this.fetchData();
           this.dialogFormVisible = false;
           this.$notify({
-            type: 'success',
-            message: r.message
+            type: "success",
+            message: r.message,
           });
         } else {
           this.$notify({
-            type: 'error',
-            message: r.message
+            type: "error",
+            message: r.message,
           });
         }
       });
     },
     // 单个删除容量定价
     deletePricing(id) {
-      this.$confirm('此操作将永久删除该容量定价, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除该容量定价, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          deletePrices(id).then(r => {
+          deletePrices(id).then((r) => {
             if (r.code == 200) {
               this.fetchData();
               this.$notify({
-                type: 'success',
-                message: r.message
+                type: "success",
+                message: r.message,
               });
             } else {
               this.$notify({
-                type: 'error',
-                message: r.message
+                type: "error",
+                message: r.message,
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消删除'
+            type: "info",
+            message: "已取消删除",
           });
         });
     },
     // 编辑容量定价
     editPrice(row) {
-      this.updataPrice = row;
-      this.dialogFormVisibleUpdata = true;
+      this.$router.push({
+        path:
+          "/operatingCentre/newServicesOperational/capacityPricing/edit/" +
+          row.id,
+      });
     },
     putPrice() {
       // console.log(this.updataPrice);
@@ -620,25 +617,25 @@ export default {
         name: this.updataPrice.name,
         status: this.updataPrice.status,
         price: this.updataPrice.price,
-        period: 'MONTH',
+        period: "MONTH",
         unit: this.updataPrice.unit,
-        quota: this.updataPrice.quota
+        quota: this.updataPrice.quota,
       };
 
       const a = JSON.parse(JSON.stringify(price));
       // console.log(a);
-      postPrices(this.updataPrice.id, a).then(r => {
+      postPrices(this.updataPrice.id, a).then((r) => {
         if (r.code == 200) {
           this.fetchData();
           this.dialogFormVisibleUpdata = false;
           this.$notify({
             message: r.message,
-            type: 'success'
+            type: "success",
           });
         } else {
           this.$notify({
             message: r.message,
-            type: 'error'
+            type: "error",
           });
         }
       });
@@ -649,35 +646,35 @@ export default {
       for (var i = 0; i < this.batchDeleted.length; i++) {
         data1.push(this.batchDeleted[i].id);
       }
-      this.$confirm('此操作将永久删除该容量定价, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除该容量定价, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          batchDeletePrices(data1).then(r => {
+          batchDeletePrices(data1).then((r) => {
             if (r.code == 200) {
               this.fetchData();
               this.$notify({
-                type: 'success',
-                message: r.message
+                type: "success",
+                message: r.message,
               });
             } else {
               this.$notify({
-                type: 'error',
-                message: r.message
+                type: "error",
+                message: r.message,
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消删除'
+            type: "info",
+            message: "已取消删除",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -694,6 +691,10 @@ export default {
 }
 /deep/ .el-input {
   font-size: 12px;
+}
+/deep/.el-input__inner {
+  height: 32px;
+  line-height: 32px;
 }
 /deep/ .el-input-number__decrease .el-icon-minus,
 /deep/ .el-input-number__increase .el-icon-plus {
@@ -736,7 +737,7 @@ export default {
   margin-bottom: 20px;
 }
 .search-input {
-  width: 150px;
+  width: 100%;
   margin: 0 10px;
 }
 </style>

@@ -12,20 +12,39 @@
         </div>
       </div>
     </el-row>
-    <el-row style="padding:15px 22px;;background:#fff;">
-      <el-col :span="24" style="margin-top:7px;">
-        <el-col :span="8">
-          <el-col :span="6" class="title">规格编码：</el-col>
-          <el-col :span="16" class="detail">project.base.abcd1234</el-col>
-        </el-col>
-        <el-col :span="8">
-          <el-col :span="5" class="title">当前版本 ：</el-col>
-          <el-col :span="16" class="detail" style="color:#0261A7">V1.4</el-col>
-        </el-col>
-        <el-col :span="8">
-          <el-col :span="5" class="title">更新时间 ：</el-col>
-          <el-col :span="16" class="detail">20191122 16:40:50</el-col>
-        </el-col>
+    <el-row style="padding:15px 22px;;background:#fff;border-bottom: 1px solid rgb(230, 230, 230);">
+      <el-col :span="3" style="padding: 8px 0px 0px 42px;">
+         <img src="web/static/images/gailanPrice.png">
+      </el-col>
+      <el-col :span="21" style="margin-top:7px;">
+        <el-row style="margin-bottom:20px;">
+          <el-col :span="8">
+            <el-col :span="6" class="title1">规格编码：</el-col>
+            <el-col :span="16" class="detail">{{pricingFrom.code}}</el-col>
+          </el-col>
+          <el-col :span="8">
+            <el-col :span="6" class="title1">规格项名称：</el-col>
+            <el-col :span="16" class="detail">{{pricingFrom.name}}</el-col>
+          </el-col>
+          <el-col :span="8">
+            <el-col :span="6" class="title1">关键字：</el-col>
+            <el-col :span="16" class="detail">{{pricingFrom.keyword}}</el-col>
+          </el-col>
+        </el-row>
+        <el-row style="margin-bottom:20px;">
+          <el-col :span="8">
+            <el-col :span="5" class="title1">当前版本 ：</el-col>
+            <el-col :span="16" class="detail" style="color:#0261A7">{{pricingFrom.version}}</el-col>
+          </el-col>
+          <el-col :span="8">
+            <el-col :span="5" class="title1">当前版本 ：</el-col>
+            <el-col :span="16" class="detail" style="color:#0261A7">{{pricingFrom.unit}}</el-col>
+          </el-col>
+          <el-col :span="8">
+            <el-col :span="5" class="title1">更新时间 ：</el-col>
+            <el-col :span="16" class="detail">{{pricingFrom.gmtModify}}</el-col>
+          </el-col>
+        </el-row>
       </el-col>
     </el-row>
     <el-row style="padding:15px 22px;;background:#fff;">
@@ -33,15 +52,18 @@
         <el-tab-pane type="primary" label="基本信息" name="first">
           <el-row :gutter="20">
             <el-col :span="24" :offset="0">
+              <el-col :span="23" style="margin-bottom: 20px;">
+                <span class="title">基本信息</span>
+              </el-col>
               <el-form
                 ref="pricingFrom"
                 :model="pricingFrom"
                 :rules="rules"
                 label-width="120px"
-                class="demo-pricingFrom"
+                class="margin-top"
               >
-                <el-col :span="10">
-                  <el-form-item label="属性编码:">
+                <el-col :span="10" :offset="1">
+                  <el-form-item label="规格项编码:" prop="code">
                     <el-input
                       v-model="pricingFrom.code"
                       :disabled="true"
@@ -50,55 +72,77 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="10" :offset="2">
-                  <el-form-item label="云资源:" prop="resources">
+                  <el-form-item
+                    label="云资源:"
+                    prop="resourceCode"
+                    :rules="[{ required: true, message: '云资源不能为空' }]"
+                  >
                     <el-select
-                      v-model="pricingFrom.resources"
+                      v-model="pricingFrom.resourceCode"
                       :disabled="true"
                       placeholder="请选择云资源"
                       style="width:90%;"
                     >
                       <el-option
                         v-for="item in list"
-                        :key="item.service.name"
-                        :value="item.service.name"
+                        :key="item.code"
+                        :label="item.name"
+                        :value="item.code"
                       />
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col :span="10">
-                  <el-form-item label="属性名称:" prop="name">
-                    <el-input :disabled="true" v-model="pricingFrom.name" placeholder="请输入云服务名称"/>
+                <el-col :span="10" :offset="1">
+                  <el-form-item
+                    label="规格项名称:"
+                    prop="attributeName"
+                    :rules="[{ required: true, message: '规格项名称不能为空' }]"
+                  >
+                    <el-input
+                      :disabled="true"
+                      v-model="pricingFrom.attributeName"
+                      placeholder="请输入规格项名称"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="10" :offset="2">
-                  <el-form-item label="云服务:" prop="category">
+                  <el-form-item
+                    label="单位:"
+                    prop="unit"
+                    :rules="[{ required: true, message: '单位不能为空' }]"
+                  >
                     <el-select
-                      v-model="pricingFrom.category"
-                      :disabled="true"
-                      placeholder="请选择类别"
-                      style="width:90%;"
+                      disabled
+                      v-model="pricingFrom.unit"
+                      style="width:90%"
+                      size="mini"
+                      placeholder="单位"
                     >
-                      <el-option v-for="item in list" :key="item.category" :value="item.category"/>
+                      <el-option
+                        v-for="item in units"
+                        :key="item.key"
+                        :label="item.label"
+                        :value="item.value"
+                      />
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col :span="20">
-                  <el-form-item label="资源单价:" prop="price" style="width:75%">
-                    <el-input v-model="pricingFrom.price" :disabled="true"/>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="23">
-                  <el-form-item label="关键字:" prop="tags" style="width:92.5%">
+                <el-col :span="10" :offset="1">
+                  <el-form-item
+                    label="关键字:"
+                    prop="keyword"
+                    :rules="[{ required: true, message: '关键字不能为空' }]"
+                  >
                     <el-input
-                      v-model="pricingFrom.tags"
+                      v-model="pricingFrom.keyword"
                       :disabled="true"
                       on-keypress="return (/[a-z]/.test(String.fromCharCode(event.keyCode)))"
                       placeholder="关键字必须英文小写"
                     />
                   </el-form-item>
                 </el-col>
-                <el-col :span="23">
-                  <el-form-item label="服务描述:" prop="description" style="width:94%">
+                <el-col :span="23" :offset="1">
+                  <el-form-item label="备注:" prop="description" style="width:94%">
                     <el-input
                       :disabled="true"
                       v-model="pricingFrom.description"
@@ -106,6 +150,35 @@
                       style="width:98%;"
                       placeholder="请输入描述文本（不超过50字）"
                     />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="23" style="margin-bottom: 20px;margin-top: 20px;">
+                  <span class="title">基本信息</span>
+                </el-col>
+                <el-col :span="10" :offset="1">
+                  <el-form-item label="单价:" prop="price">
+                    <el-input v-model="pricingFrom.price" :disabled="true" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                  <el-form-item
+                    label="计费周期:"
+                    prop="period"
+                    :rules="[{ required: true, message: '计费周期不能为空' }]"
+                  >
+                    <el-select
+                      v-model="pricingFrom.period"
+                      disabled
+                      size="mini"
+                      placeholder="请选择计费周期"
+                    >
+                      <el-option
+                        v-for="item in periods"
+                        :key="item.key"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
                   </el-form-item>
                 </el-col>
               </el-form>
@@ -120,7 +193,7 @@
                 <div class="table-wrap">
                   <el-table :data="list1" size="small">
                     <el-table-column :show-overflow-tooltip="true" label="时间" align="center">
-                      <template slot-scope="scope">{{ scope.row.time }}</template>
+                      <template slot-scope="scope">{{ scope.row.gmtCreate }}</template>
                     </el-table-column>
                     <el-table-column
                       :show-overflow-tooltip="true"
@@ -131,7 +204,7 @@
                       <template slot-scope="scope">{{ scope.row.content }}</template>
                     </el-table-column>
                     <el-table-column :show-overflow-tooltip="true" label="版本" align="center">
-                      <template slot-scope="scope">{{ scope.row.result }}</template>
+                      <template slot-scope="scope">{{ scope.row.version }}</template>
                     </el-table-column>
                     <el-table-column :show-overflow-tooltip="true" label="更新人" align="center">
                       <template slot-scope="scope">{{ scope.row.update }}</template>
@@ -147,51 +220,86 @@
   </div>
 </template>
 <script>
-import Pagination from '@/components/pagination';
-import { requestParams, parseHash } from '@/utils/urlParam';
-import { getonePrices, queryByIdCloudServiceFun } from '@/api/serviceOperating';
+import Pagination from "@/components/pagination";
+import { requestParams, parseHash } from "@/utils/urlParam";
+import {
+  getonePrices,
+  queryByIdCloudServiceFun,
+  getHistoryPrices,
+  getResourcesList,
+} from "@/api/serviceOperating";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {},
   data() {
     return {
-      activeName: 'first',
+      activeName: "first",
       pricingFrom: {},
       list: [],
-      list1: [
-
+      list1: [],
+      units: [
+        {
+          value: "Core",
+          label: "Core",
+        },
+        {
+          value: "GB",
+          label: "GB",
+        },
+        {
+          value: "GB",
+          label: "GB",
+        },
+      ],
+      periods: [
+        {
+          value: "DAY",
+          label: "日",
+        },
+        {
+          value: "MONTH",
+          label: "月",
+        },
+        {
+          value: "YEAR",
+          label: "年",
+        },
       ],
       disabled: false,
       rules: {
         code: [
-          { required: true, message: '请输入服务编码', trigger: 'blur' }
+          { required: true, message: "请输入服务编码", trigger: "blur" },
           // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
         name: [
-          { required: true, message: '请输入云活动名称', trigger: 'blur' }
+          { required: true, message: "请输入云活动名称", trigger: "blur" },
           // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
         resources: [
-          { required: true, message: '请选择云资源名称', trigger: 'blur' }
+          { required: true, message: "请选择云资源名称", trigger: "blur" },
           // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
-        category: [{ required: true, message: '请选择类别', trigger: 'blur' }],
-        price: [{ required: true, message: '请选择类别', trigger: 'blur' }],
+        category: [{ required: true, message: "请选择类别", trigger: "blur" }],
+        price: [{ required: true, message: "请选择类别", trigger: "blur" }],
         tags: [
-          { required: true, message: '注：关键字必须英文小写', trigger: 'blur' }
+          {
+            required: true,
+            message: "注：关键字必须英文小写",
+            trigger: "blur",
+          },
         ],
         description: [
-          { required: true, message: '请输入描述文本', trigger: 'blur' }
-        ]
+          { required: true, message: "请输入描述文本", trigger: "blur" },
+        ],
       },
       inputa: true,
       rl: 128,
       rlmax: 136,
       isservice: 15,
       isservicemax: 18,
-      dialogVisible: false
+      dialogVisible: false,
     };
   },
   created() {
@@ -200,24 +308,35 @@ export default {
   methods: {
     async fetchData() {
       const res = await requestParams(getonePrices, this.$route.params.id);
-      // console.log(res);
+      console.log(res);
       this.pricingFrom = res.content;
+      const res1 = await requestParams(getResourcesList, this.search);
+      this.list = res1.content.content;
       // console.log(this.pricingFrom);
+      const res2 = await requestParams(getHistoryPrices, this.$route.params.id);
+      this.list1 = res2.content.content;
+      console.log(this.list1);
     },
     back() {
       this.$router.push({
-        path: '/operatingCentre/newServicesOperational/capacityPricing'
+        path: "/operatingCentre/newServicesOperational/capacityPricing",
       }); // 返回上一层
     },
     onSubmit() {
-      console.log('submit!');
-    }
-  }
+      console.log("submit!");
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
 @import "../../../rewrite.scss";
-.title {
+.title1 {
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+}
+/deep/ .el-form-item__label {
   font-size: 14px;
   font-family: Microsoft YaHei;
   font-weight: 400;
@@ -233,6 +352,34 @@ export default {
   height: 32px;
   line-height: 32px;
   font-size: 14px;
+}
+/deep/.el-form-item__content {
+  line-height: 42px;
+  position: relative;
+  font-size: 14px;
+}
+.title {
+  border-left: 5px #0261a7 solid;
+  line-height: 22px;
+  margin-left: 2%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}
+/depp/.el-form-item__label {
+  text-align: right;
+  vertical-align: middle;
+  float: left;
+  line-height: 40px;
+  padding: 0 12px 0 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 14px !important;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  color: rgba(255, 45, 37, 1);
 }
 </style>
 <style>

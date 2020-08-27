@@ -5,11 +5,11 @@
         <el-form
           ref="cloudServiceFrom"
           :model="cloudServiceFrom"
-          :rules="rules"
+          :rules="cloudServiceFrom"
           label-width="120px"
           class="demo-cloudServiceFrom"
         >
-          <el-col :span="10">
+          <el-col :span="20">
             <el-form-item label="服务编码:">
               <el-input
                 v-model="cloudServiceFrom.code"
@@ -18,44 +18,46 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="云资源:" prop="resources">
+          <el-col :span="20">
+            <el-form-item label="云资源:" prop="resourceCode">
               <el-select
-                v-model="cloudServiceFrom.resources"
+                disabled
+                v-model="cloudServiceFrom.resourceCode"
                 placeholder="请选择云资源"
-                style="width:90%;"
+                style="width:100%;"
               >
-                <el-option v-for="item in list" :key="item.service.name" :value="item.service.name"/>
+                <el-option
+                  v-for="item in list1"
+                  :key="item.code"
+                  :label="item.name"
+                  :value="item.code"
+                />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="20">
             <el-form-item label="云产品名称:" prop="name">
-              <el-input v-model="cloudServiceFrom.name" placeholder="请输入云产品名称"/>
+              <el-input v-model="cloudServiceFrom.name" disabled placeholder="请输入云产品名称" />
             </el-form-item>
           </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="分类:" prop="category">
-              <el-select v-model="cloudServiceFrom.category" placeholder="请选择类别" style="width:90%;">
-                <el-option v-for="item in list" :key="item.category" :value="item.category"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="10">
-            <el-form-item label="关键字:" prop="tags">
+
+          <el-col :span="20">
+            <el-form-item label="关键字:" prop="keyword">
               <el-input
-                v-model="cloudServiceFrom.tags"
+                disabled
+                v-model="cloudServiceFrom.keyword"
                 on-keypress="return (/[a-z]/.test(String.fromCharCode(event.keyCode)))"
                 placeholder="关键字必须英文小写"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="23">
+          <el-col :span="20">
             <el-form-item label="服务描述:" prop="description" style="width:94%">
               <el-input
+                disabled
                 v-model="cloudServiceFrom.description"
                 type="textarea"
-                style="width:98%;"
+                style="width:100%;"
                 placeholder="请输入描述文本（不超过50字）"
               />
             </el-form-item>
@@ -66,14 +68,15 @@
   </div>
 </template>
 <script>
-import Pagination from '@/components/pagination';
-import { requestParams, parseHash } from '@/utils/urlParam';
+import Pagination from "@/components/pagination";
+import { requestParams, parseHash } from "@/utils/urlParam";
 import {
-  queryByIdCloudServiceFun
-} from '@/api/serviceOperating';
+  queryByIdCloudServiceFun,
+  getResourcesList,
+} from "@/api/serviceOperating";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {},
   data() {
@@ -81,33 +84,7 @@ export default {
       cloudServiceFrom: {},
       list: [],
       disabled: false,
-      rules: {
-        code: [
-          { required: true, message: '请输入服务编码', trigger: 'blur' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        name: [
-          { required: true, message: '请输入云活动名称', trigger: 'blur' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        resources: [
-          { required: true, message: '请选择云资源名称', trigger: 'blur' }
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        category: [{ required: true, message: '请选择类别', trigger: 'blur' }],
-        tags: [
-          { required: true, message: '注：关键字必须英文小写', trigger: 'blur' }
-        ],
-        description: [
-          { required: true, message: '请输入描述文本', trigger: 'blur' }
-        ]
-      },
-      inputa: true,
-      rl: 128,
-      rlmax: 136,
-      isservice: 15,
-      isservicemax: 18,
-      dialogVisible: false
+      list1: [],
     };
   },
   created() {
@@ -119,14 +96,17 @@ export default {
       //   queryByIdCloudServiceFun,
       //   this.$route.params.id
       // );
-      await queryByIdCloudServiceFun(this.$route.params.id).then(res => {
+      const res1 = await requestParams(getResourcesList, this.search);
+      this.list1 = res1.content.content;
+      await queryByIdCloudServiceFun(this.$route.params.id).then((res) => {
+        console.log(res);
         this.cloudServiceFrom = res.content;
       });
     },
     onSubmit() {
-      console.log('submit!');
-    }
-  }
+      console.log("submit!");
+    },
+  },
 };
 </script>
 <style lang="scss">

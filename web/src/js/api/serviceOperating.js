@@ -51,7 +51,7 @@ export function createdCloudService(data) {
 export function editCloudServiceFun(params, data) {
   return request({
     url: `/api/cloud/osms/v1/services/${params}`,
-    method: 'put',
+    method: 'PATCH',
     data
   });
 }
@@ -162,6 +162,13 @@ export function createdPrices(data) {
     data
   });
 }
+// 获取操作记录
+export function getHistoryPrices(id) {
+  return request({
+    url: `/api/cloud/osms/v1/prices/${id}/history`,
+    method: 'get',
+  });
+}
 
 // 单个删除容量定价
 export function deletePrices(params) {
@@ -190,14 +197,7 @@ export function getonePrices(id) {
 // ----------------  容量定价API End     ------------------------------
 
 // ----------------  云资源API Start   -------------------------------
-// 云资源列表
-export function getResourcesList(params) {
-  return request({
-    url: '/api/cloud/osms/v1/resources',
-    method: 'get',
-    params
-  });
-}
+
 // 添加云资源
 export function createdCloudResource(data) {
   return request({
@@ -243,7 +243,7 @@ export function getCloudResourceInfo(id) {
 export function editCloudResourceInfo(id, data) {
   return request({
     url: `/api/cloud/osms/v1/resources/${id}`,
-    method: 'put',
+    method: 'PATCH',
     data
   });
 }
@@ -309,9 +309,9 @@ export function getskuspecs(skuid) {
 }
 
 // 编辑sku规格信息
-export function editskuspace(skuid, id, data) {
+export function editskuspace(id, data) {
   return request({
-    url: `/api/cloud/osms/v1/skus/${skuid}/specs/${id}`,
+    url: `/api/cloud/osms/v1/skus/${id}`,
     method: 'put',
     data
   });
@@ -350,6 +350,14 @@ export function editskuState(id, data) {
     data
   });
 }
+// 获取sku更新记录
+export function getSkuHistory(id) {
+  return request({
+    url: `/api/cloud/osms/v1/skus/${id}/history`,
+    method: 'get',
+  });
+}
+
 // 获取云服务规格关联的计价信息接口
 export function getskuPrice(id) {
   return request({
@@ -433,11 +441,10 @@ export function editParams(id, data) {
   });
 }
 // 删除参数组接口
-export function deleteParams(params) {
+export function deleteParams(id) {
   return request({
     url: `/api/cloud/osms/v1/params/${id}`,
-    method: 'get',
-    params
+    method: 'delete'
   });
 }
 // 获取参数组详情接口
@@ -450,8 +457,26 @@ export function getParamsInfo(id) {
 // 参数组发布接口
 export function publishParams(id) {
   return request({
-    url: `/api/cloud/osms/v1/params/publish/${id}`,
+    url: `/api/cloud/osms/v1/params/${id}/publish`,
     method: 'put'
   });
 }
-// ----------------  参数组 API End     -------------------------------
+// 参数组撤回接口
+export function revokeParams(id) {
+  return request({
+    url: `/api/cloud/osms/v1/params/${id}/revoke`,
+    method: 'put'
+  });
+}
+// ----------------  新服务运营接口     -------------------------------
+
+// 云资源列表
+export function getResourcesList(params) {
+  return request({
+    url: '/api/cloud/osms/v1/resources',
+    method: 'get',
+    params
+  });
+}
+// ----------------  参数组     -------------------------------
+

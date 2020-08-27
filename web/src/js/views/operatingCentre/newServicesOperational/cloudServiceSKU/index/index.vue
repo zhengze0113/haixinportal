@@ -3,17 +3,27 @@
     <el-row :gutter="20" class="primaryBackground">
       <el-col :span="24" :offset="0" style="padding:10px">
         <div class="grid-content bg-purple">
-          <el-col :span="9" style="padding:0">
+          <el-col :span="2" style="padding:0">
             <div class="left" style="margin-right:27px;">
-              <el-button
-                size="small"
-                icon="el-icon-plus"
-                type="primary"
-                @click="addSpecification=true"
-              >新建</el-button>
+              <el-button size="small" icon="el-icon-plus" type="primary" @click="addSku">新建</el-button>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="6" :offset="2">
+            <el-row class="right">
+              <el-col :span="6" style="line-height:32px">云资源:</el-col>
+              <el-col :span="18">
+                <el-select v-model="value1" size="mini" placeholder="请选择云资源">
+                  <el-option
+                    v-for="item in cloudProducts"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="6">
             <el-row class="right">
               <el-col :span="6" style="line-height:32px">云服务:</el-col>
               <el-col :span="18">
@@ -29,26 +39,11 @@
             </el-row>
           </el-col>
 
-          <el-col :span="4" :offset="1">
-            <el-row class="right">
-              <el-col :span="8" style="line-height:32px">云资源:</el-col>
-              <el-col :span="16">
-                <el-select v-model="value1" size="mini" placeholder="请选择云资源">
-                  <el-option
-                    v-for="item in cloudProducts"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="5">
-            <el-row class="right">
-              <el-col :span="6" style="line-height:32px">关键字：</el-col>
-              <el-col :span="18">
-                <el-col :span="18">
+          <el-col :span="8">
+            <el-row class="left">
+              <el-col :span="4" style="line-height:32px">关键字：</el-col>
+              <el-col :span="20">
+                <el-col :span="14">
                   <el-input
                     v-model="searchInput"
                     size="mini"
@@ -57,16 +52,15 @@
                   />
                 </el-col>
                 <el-col :span="6">
-                  <el-button size="small" icon="el-icon-search">查询</el-button>
+                  <el-button size="small" @click="query()" icon="el-icon-search">查询</el-button>
+                </el-col>
+                <el-col :span="1" :offset="1">
+                  <el-button type="primary" @click="reset()" icon="el-icon-search">重置</el-button>
                 </el-col>
               </el-col>
             </el-row>
           </el-col>
-          <el-col :span="1" style="padding:0">
-            <el-row class="right">
-              <el-button size="small" type="primary">重置</el-button>
-            </el-row>
-          </el-col>
+
           <el-table
             v-loading="listLoading"
             :data="list"
@@ -79,7 +73,6 @@
             @row-click="handleRowClick"
             @selection-change="handleSelectionChange"
           >
-            <el-table-column type="selection"/>
             <el-table-column label="编码" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
                 <router-link
@@ -88,14 +81,14 @@
                 >{{ scope.row.code }}</router-link>
               </template>
             </el-table-column>
-            <el-table-column label="云服务" align="center" show-overflow-tooltip>
-              <template slot-scope="scope">
-                <span>{{ scope.row.description }}</span>
-              </template>
-            </el-table-column>
             <el-table-column label="云资源" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.description }}</span>
+                <span>{{ scope.row.resource.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="云服务" align="center" show-overflow-tooltip>
+              <template slot-scope="scope">
+                <span>{{ scope.row.service.name }}</span>
               </template>
             </el-table-column>
             <el-table-column label="规格名称" align="center" show-overflow-tooltip>
@@ -105,22 +98,22 @@
             </el-table-column>
             <el-table-column label="版本" align="center">
               <template slot-scope="scope">
-                <span>V1.4</span>
+                <span>{{ scope.row.version }}</span>
               </template>
             </el-table-column>
             <el-table-column label="规格详细" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.specContent }}</span>
+                <span>{{ scope.row.cpuCores }} / {{ scope.row.memory}}</span>
               </template>
             </el-table-column>
             <el-table-column label="单价(元/月)" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>1800</span>
+                <span>{{ scope.row.price }}</span>
               </template>
             </el-table-column>
             <el-table-column label="状态" align="center">
               <template slot-scope="scope">
-                <span>生效</span>
+                <span>{{ scope.row.status == 0 ? "上架中" : "已下架" }}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" prop="created_at" label="创建时间" show-overflow-tooltip>
@@ -132,7 +125,7 @@
               <template slot-scope="scope">
                 <el-link class="link" type="primary" @click="updataSku(scope.row)">编辑</el-link>
                 <el-link class="link" type="danger" @click="deletedSKU(scope.row.id)">删除</el-link>
-                <el-link class="link" type="primary" @click="open()">失效</el-link>
+                <el-link class="link" type="primary" @click="open(scope.row.id)">失效</el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -140,175 +133,12 @@
         </div>
       </el-col>
     </el-row>
-
-    <el-dialog :visible.sync="addSpecification" title="新增规格" width="60%">
-      <el-form
-        ref="ruleForm"
-        :model="skuParameter"
-        :rules="rules"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="规格编码：">
-          <el-input v-model="skuParameter.code" disabled="disabled"/>
-        </el-form-item>
-        <el-form-item label="规格名称：" prop="name">
-          <el-input v-model="skuParameter.name" placeholder="请输入规格名称"/>
-        </el-form-item>
-        <el-form-item label="云资源：" prop="resourceId">
-          <el-select v-model="skuParameter.resourceId" placeholder="请选择云资源" @change="serviceChange">
-            <el-option
-              v-for="item in serviceOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="云服务：" prop="serviceId">
-          <el-select v-model="skuParameter.serviceId" placeholder="请选择云服务">
-            <el-option
-              v-for="item in cloudProducts"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="关键字：" prop="keyword" placeholder="请输入关键字">
-          <el-input v-model="skuParameter.keyword"/>
-          <span
-            style="font-size:12px;font-family:Microsoft YaHei;font-weight:400;color:rgba(255,45,37,1);"
-          >注：关键字必须英文小写。</span>
-        </el-form-item>
-
-        <el-form-item label="定价项：" prop="CPU">
-          <el-col :span="5">
-            <span class="labelFont">CPU（Core）</span>
-          </el-col>
-          <el-input-number v-model="skuParameter.CPU" :min="1" :max="10" label/>
-        </el-form-item>
-        <el-form-item label prop="memory">
-          <el-col :span="5">
-            <span class="labelFont">内存（GB）</span>
-          </el-col>
-          <el-input-number v-model="skuParameter.memory" :min="1" :max="10" label/>
-        </el-form-item>
-        <el-form-item label prop="storage">
-          <el-col :span="5">
-            <span class="labelFont">存储（GB）</span>
-          </el-col>
-          <el-select v-model="skuParameter.storage" style="width: 180px;">
-            <el-option label="50" value="50"/>
-            <el-option label="100" value="100"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-row>
-            <el-col :span="20" style="text-align: right;">
-              <span class="labelFont">成本（元/月）：</span>
-            </el-col>
-            <el-col :span="4" style="text-align: left;">
-              <span class="money">¥85.00</span>
-            </el-col>
-          </el-row>
-        </el-form-item>
-
-        <el-form-item
-          style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
-        >
-          <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
-          <el-button @click="addSpecification=false">取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
-    <el-dialog :visible.sync="updataSpecification" title="编辑规格" width="60%">
-      <el-form
-        ref="ruleForm"
-        :model="skuUpdata"
-        :rules="rules"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="规格编码：">
-          <el-input v-model="skuUpdata.code" disabled="disabled"/>
-        </el-form-item>
-        <el-form-item label="规格名称：" prop="name">
-          <el-input v-model="skuUpdata.name" placeholder="请输入规格名称"/>
-        </el-form-item>
-        <el-form-item label="云资源：" prop="resourceId">
-          <el-select v-model="skuUpdata.resourceId" placeholder="请选择云资源" @change="serviceChange">
-            <el-option
-              v-for="item in serviceOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="云服务：" prop="serviceId">
-          <el-select v-model="skuUpdata.serviceId" placeholder="请选择云服务">
-            <el-option
-              v-for="item in cloudProducts"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="关键字：" prop="keyword" placeholder="请输入关键字">
-          <el-input v-model="skuUpdata.keyword"/>
-          <span
-            style="font-size:12px;font-family:Microsoft YaHei;font-weight:400;color:rgba(255,45,37,1);"
-          >注：关键字必须英文小写。</span>
-        </el-form-item>
-
-        <el-form-item label="定价项：" prop="CPU">
-          <el-col :span="5">
-            <span class="labelFont">CPU（Core）</span>
-          </el-col>
-          <el-input-number v-model="skuUpdata.CPU" :min="1" :max="10" label/>
-        </el-form-item>
-        <el-form-item label prop="memory">
-          <el-col :span="5">
-            <span class="labelFont">内存（GB）</span>
-          </el-col>
-          <el-input-number v-model="skuUpdata.memory" :min="1" :max="10" label/>
-        </el-form-item>
-        <el-form-item label prop="storage">
-          <el-col :span="5">
-            <span class="labelFont">存储（GB）</span>
-          </el-col>
-          <el-select v-model="skuUpdata.storage" style="width: 180px;">
-            <el-option label="50" value="50"/>
-            <el-option label="100" value="100"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-row>
-            <el-col :span="20" style="text-align: right;">
-              <span class="labelFont">成本（元/月）：</span>
-            </el-col>
-            <el-col :span="4" style="text-align: left;">
-              <span class="money">¥85.00</span>
-            </el-col>
-          </el-row>
-        </el-form-item>
-
-        <el-form-item
-          style="text-align:right;border-top:1px solid #d3d3d3;margin-top: 40px;padding-top: 10px;"
-        >
-          <el-button type="primary" @click="updataSpecification=false">保存</el-button>
-          <el-button @click="updataSpecification=false">取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 // import {Servelist} from "@/api/table";
-import Pagination from '@/components/pagination';
+import Pagination from "@/components/pagination";
 import {
   getSKUList,
   deleteSKU,
@@ -317,58 +147,59 @@ import {
   queryByIdCloudServiceFun, // 获取云服务详细信息
   getResourcesList, // 云产品集合
   createdSKU,
-  editCloudServiceFun // 编辑sku
-} from '@/api/serviceOperating'; // deleteSKU,skudelete
-import { requestParams, parseHash } from '@/utils/urlParam';
+  editCloudServiceFun, // 编辑sku
+  editskuspace,
+} from "@/api/serviceOperating"; // deleteSKU,skudelete
+import { requestParams, parseHash } from "@/utils/urlParam";
 export default {
   components: {
-    Pagination
+    Pagination,
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      };
-      return statusMap[status];
-    }
-  },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
+        published: "success",
+        draft: "gray",
+        deleted: "danger",
       };
       return statusMap[status];
     },
-    formatTime: function(date, fmt) {
+  },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: "success",
+        draft: "gray",
+        deleted: "danger",
+      };
+      return statusMap[status];
+    },
+    formatTime: function (date, fmt) {
       var date = new Date(date);
       if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(
           RegExp.$1,
-          (date.getFullYear() + '').substr(4 - RegExp.$1.length)
+          (date.getFullYear() + "").substr(4 - RegExp.$1.length)
         );
       }
       var o = {
-        'M+': date.getMonth() + 1,
-        'd+': date.getDate(),
-        'h+': date.getHours(),
-        'm+': date.getMinutes(),
-        's+': date.getSeconds()
+        "M+": date.getMonth() + 1,
+        "d+": date.getDate(),
+        "h+": date.getHours(),
+        "m+": date.getMinutes(),
+        "s+": date.getSeconds(),
       };
       for (var k in o) {
-        if (new RegExp('(' + k + ')').test(fmt)) {
-          var str = o[k] + '';
+        if (new RegExp("(" + k + ")").test(fmt)) {
+          var str = o[k] + "";
           fmt = fmt.replace(
             RegExp.$1,
-            RegExp.$1.length === 1 ? str : ('00' + str).substr(str.length)
+            RegExp.$1.length === 1 ? str : ("00" + str).substr(str.length)
           );
         }
       }
       return fmt;
-    }
+    },
   },
   data() {
     return {
@@ -377,22 +208,30 @@ export default {
       listLoading: true,
       search: {
         page: 1,
-        rows: 10
+        rows: 10,
+        serviceCode: null,
+        resourceCode: null,
+        name: null,
+      },
+      search1: {
+        page: 1,
+        rows: 1000,
       },
       resourceOptions: [],
       serviceList: [], // 云资源list
       cloudProducts: [], // 云产品list
       options: {
-        value: '',
-        label: ''
+        value: "",
+        label: "",
       },
-      value: '',
-      value1: '',
+      value: null,
+      value1: null,
+      searchInput: null,
       num: 1,
       patchDeleted: null,
       metadata: undefined,
       updataSpecification: false,
-      searchInput: '',
+
       expandRowKeys: [],
       addSpecification: false,
       percentage: 0,
@@ -403,116 +242,154 @@ export default {
       storage: 0,
       guanbi: false,
       isDelete: false,
-      radioattestation: '',
-      radiodeleteCS: '',
-      radiodeleteSKU: '',
-      radiodeleteSM: '',
-      customColor: '#409eff',
-      category: '个人',
+      radioattestation: "",
+      radiodeleteCS: "",
+      radiodeleteSKU: "",
+      radiodeleteSM: "",
+      customColor: "#409eff",
+      category: "个人",
       numberSKU: 20,
-      privatelyOwned: 'YES',
+      privatelyOwned: "YES",
       rules: {
-        name: [{ required: true, message: '请输入规格名称', trigger: 'blur' }],
+        name: [{ required: true, message: "请输入规格名称", trigger: "blur" }],
         resourceId: [
-          { required: true, message: '请选择云资源', trigger: 'change' }
+          { required: true, message: "请选择云资源", trigger: "change" },
         ],
         serviceId: [
-          { required: true, message: '请选择云服务', trigger: 'change' }
+          { required: true, message: "请选择云服务", trigger: "change" },
         ],
         keyword: [
-          { required: true, message: '请输入关键字', trigger: 'change' }
+          { required: true, message: "请输入关键字", trigger: "change" },
         ],
-        CPU: [{ required: true, message: '请输入CUP', trigger: 'change' }],
-        memory: [{ required: true, message: '请输入内存', trigger: 'change' }],
-        storage: [{ required: true, message: '请输入存储', trigger: 'change' }]
+        CPU: [{ required: true, message: "请输入CUP", trigger: "change" }],
+        memory: [{ required: true, message: "请输入内存", trigger: "change" }],
+        storage: [{ required: true, message: "请输入存储", trigger: "change" }],
       },
       skuParameter: {
         CPU: 0,
-        code: '',
+        code: "",
         memory: 0,
         storage: 0,
-        keyword: '',
+        keyword: "",
         catalogId: 0,
-        description: '',
-        icon: '',
+        description: "",
+        icon: "",
         initStock: 0,
-        name: '',
+        name: "",
         orgId: 0,
         price: {},
-        resourceId: '',
-        serviceId: '',
-        specContent: '',
+        resourceId: "",
+        serviceId: "",
+        specContent: "",
         specs: [],
-        status: '',
+        status: "",
         stock: 0,
-        tags: '',
+        tags: "",
         tenantId: 0,
-        userId: 0
+        userId: 0,
       },
       skuUpdata: {
         CPU: 0,
-        code: '',
+        code: "",
         memory: 0,
         storage: 0,
-        keyword: '',
+        keyword: "",
         catalogId: 0,
-        code: '',
-        description: '',
-        icon: '',
+        code: "",
+        description: "",
+        icon: "",
         initStock: 0,
-        name: '',
+        name: "",
         orgId: 0,
         price: {},
-        resourceId: '',
-        serviceId: '',
-        specContent: '',
+        resourceId: "",
+        serviceId: "",
+        specContent: "",
         specs: [],
-        status: '',
+        status: "",
         stock: 0,
-        tags: '',
+        tags: "",
         tenantId: 0,
-        userId: 0
+        userId: 0,
       },
-      serviceOptions: []
+      serviceOptions: [],
     };
   },
   created() {
     this.fetchData();
   },
+
   methods: {
-    // 失效
-    open() {
-      this.$confirm('确定使该条云服务失效吗?', '操作提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '失效成功!'
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消失效'
-        });
+    async reset() {
+      this.value1 = null;
+      this.value = null;
+      this.searchInput = null;
+      this.search.serviceCode = null;
+      this.search.resourceCode = null;
+      this.search.name = null;
+      const res = await requestParams(getSKUList, this.search);
+      this.metadata = res.metadata;
+      this.list = res.content.content;
+      const r1 = await requestParams(getCloudServiceList);
+      this.listLoading = false;
+    },
+    async query() {
+      this.search.serviceCode = this.value1 == "" ? null : this.value1;
+      this.search.resourceCode = this.value == "" ? null : this.value;
+      this.search.name = this.searchInput == "" ? null : this.searchInput;
+      const res = await requestParams(getSKUList, this.search);
+      this.metadata = res.metadata;
+      this.list = res.content.content;
+      const r1 = await requestParams(getCloudServiceList);
+      this.listLoading = false;
+    },
+    addSku() {
+      this.$router.push({
+        path: "/operatingCentre/newServicesOperational/cloudServiceSKU/add",
       });
+    },
+    // 失效
+    open(id) {
+      this.$confirm("确定使该条云服务失效吗?", "操作提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let params = {
+            status: 1,
+          };
+          editskuspace(id, params).then((r) => {
+            if (r.code == 201) {
+              this.fetchData();
+              this.$emit("countFater");
+              this.$notify({
+                type: "success",
+                message: r.message,
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消失效",
+          });
+        });
     },
     // 新建规格
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
-          createdSKU().then(res => {
-
-          });
+          createdSKU().then((res) => {});
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
       });
     },
     onSubmit() {
-      console.log('submit!');
+      console.log("submit!");
     },
 
     async fetchData() {
@@ -522,22 +399,22 @@ export default {
       this.list = res.content.content;
       this.listLoading = false;
       // 初始化云资源
-      const r = await requestParams(getResourcesList, this.search);
+      const r = await requestParams(getResourcesList, this.search1);
       this.serviceList = r.content.content;
       for (var i = 0; i < this.serviceList.length; i++) {
-        this.options.value = this.serviceList[i].id;
+        this.options.value = this.serviceList[i].code;
         this.options.label = this.serviceList[i].name;
         this.serviceOptions.push(this.options);
-        this.options = { value: '', label: '' };
+        this.options = { value: "", label: "" };
       }
-      // 初始化云产品
-      const r1 = await requestParams(getCloudServiceList, this.search);
+      // 初始化云资源
+      const r1 = await requestParams(getCloudServiceList);
       var resourlist = r1.content.content;
       for (var i = 0; i < resourlist.length; i++) {
-        this.options.value = resourlist[i].id;
+        this.options.value = resourlist[i].code;
         this.options.label = resourlist[i].name;
         this.cloudProducts.push(this.options);
-        this.options = { value: '', label: '' };
+        this.options = { value: "", label: "" };
       }
     },
     tableChange({ page, rows }) {
@@ -546,7 +423,7 @@ export default {
       this.fetchData();
     },
     handleRowClick(row, column, event) {
-      if (event.target.nodeName.toLocaleLowerCase() != 'div') return;
+      if (event.target.nodeName.toLocaleLowerCase() != "div") return;
       const index = this.expandRowKeys.indexOf(row.id);
       if (index == -1) {
         this.expandRowKeys.push(row.id);
@@ -558,31 +435,35 @@ export default {
     // 编辑sku
     updataSku(data) {
       this.skuUpdata = data;
-      this.updataSpecification = true;
+      this.$router.push({
+        path:
+          "/operatingCentre/newServicesOperational/cloudServiceSKU/edit/" +
+          data.id,
+      });
     },
     // 删除sku
     deletedSKU(id) {
-      this.$confirm('此操作将永久删除该SKU, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除该SKU, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          deleteSKU(id).then(r => {
+          deleteSKU(id).then((r) => {
             if (r.code == 200) {
               this.fetchData();
-              this.$emit('countFater');
+              this.$emit("countFater");
               this.$notify({
-                type: 'success',
-                message: r.message
+                type: "success",
+                message: r.message,
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: r.message
+            type: "info",
+            message: r.message,
           });
         });
     },
@@ -592,32 +473,32 @@ export default {
       for (var i = 0; i < this.patchDeleted.length; i++) {
         data1.push(this.patchDeleted[i].id);
       }
-      this.$confirm('此操作将永久删除该SKU, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除该SKU, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          batchDeletesku(data1).then(r => {
+          batchDeletesku(data1).then((r) => {
             if (r.code == 200) {
               this.fetchData();
-              this.$emit('countFater');
+              this.$emit("countFater");
               this.$notify({
-                type: 'success',
-                message: '批量删除成功!'
+                type: "success",
+                message: "批量删除成功!",
               });
             } else {
               this.$notify({
-                type: 'info',
-                message: '删除失败，请重试'
+                type: "info",
+                message: "删除失败，请重试",
               });
             }
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消删除'
+            type: "info",
+            message: "已取消删除",
           });
         });
     },
@@ -634,11 +515,11 @@ export default {
     },
     customColorMethod(percentage) {
       if (percentage < 30) {
-        return '#909399';
+        return "#909399";
       } else if (percentage < 70) {
-        return '#e6a23c';
+        return "#e6a23c";
       } else {
-        return '#67c23a';
+        return "#67c23a";
       }
     },
     increase() {
@@ -666,21 +547,21 @@ export default {
       }, 1000);
     },
     online() {
-      this.$confirm('此操作将上线该服务, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将上线该服务, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
           this.$notify({
-            type: 'success',
-            message: '上线成功!'
+            type: "success",
+            message: "上线成功!",
           });
         })
         .catch(() => {
           this.$notify({
-            type: 'info',
-            message: '已取消上线'
+            type: "info",
+            message: "已取消上线",
           });
         });
     },
@@ -700,10 +581,9 @@ export default {
     handleChange() {},
     // 选择云资源后获取云服务下拉
     serviceChange(data) {
-      queryByIdCloudServiceFun(data).then(r => {
-      });
-    }
-  }
+      queryByIdCloudServiceFun(data).then((r) => {});
+    },
+  },
 };
 </script>
 
