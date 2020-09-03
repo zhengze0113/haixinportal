@@ -25,7 +25,7 @@
       ></introduction>
     </el-row>
     <el-row v-if="active == 3" style="padding:10px;">
-      <selection @listenToChildEvent="showMsgFromChild"></selection>
+      <selection @listenToChildEvent="showMsgFromChild" :id="id"></selection>
     </el-row>
     <el-row v-if="active == 4">
       <configuration

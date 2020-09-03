@@ -239,6 +239,14 @@ export function getCloudResourceInfo(id) {
     method: 'get'
   });
 }
+
+// 获取云资源选云服务列表
+export function getCloudServicesInfo(id) {
+  return request({
+    url: `/api/cloud/osms/v1/resources/${id}/services`,
+    method: 'get'
+  });
+}
 // 编辑云资源
 export function editCloudResourceInfo(id, data) {
   return request({

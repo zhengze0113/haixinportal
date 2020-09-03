@@ -83,12 +83,12 @@
             </el-table-column>
             <el-table-column label="云资源" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.resource.name }}</span>
+                <span>{{ scope.row.resource == null? "——":scope.row.resource.name}}</span>
               </template>
             </el-table-column>
             <el-table-column label="云服务" align="center" show-overflow-tooltip>
               <template slot-scope="scope">
-                <span>{{ scope.row.service.name }}</span>
+                <span>{{ scope.row.service == null? "——":scope.row.service.name}}</span>
               </template>
             </el-table-column>
             <el-table-column label="规格名称" align="center" show-overflow-tooltip>

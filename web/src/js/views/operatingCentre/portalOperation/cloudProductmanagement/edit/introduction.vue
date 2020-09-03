@@ -86,7 +86,9 @@ export default {
       }
     };
   },
-  mounted() {},
+  mounted() {
+    console.log(this.object); 
+  },
   methods: {
     //  子组件更新的值
     change(type) {
@@ -98,6 +100,7 @@ export default {
     nextbottom() {
       const params = new FormData();
       params.append("content", this.$refs.ueditor.getDoContent());
+      console.log(params)
       editcloudproductimg(this.object.id, params).then(r => {
         if (r.id != "") {
           const active_3 = 3;

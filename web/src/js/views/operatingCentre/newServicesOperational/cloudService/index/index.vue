@@ -327,6 +327,7 @@ export default {
       const res = await requestParams(getCloudServiceList, this.search);
       this.list = res.content.content;
       this.metadata = res.metadata;
+      const res2 = await requestParams(getResourcesList);
       this.listLoading = false;
     },
     async reset() {
@@ -352,7 +353,7 @@ export default {
       this.metadataSelect = res1.metadata;
       console.log(this.list1);
       this.metadata = res.metadata;
-
+      const res2 = await requestParams(getResourcesList);
       this.listLoading = false;
     },
     // 分页

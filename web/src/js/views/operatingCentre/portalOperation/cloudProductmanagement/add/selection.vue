@@ -6,19 +6,19 @@
         <el-table :data="list" style="width: 100%">
           <el-table-column label="云资源" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.attribute" @change="change()">
+              <el-select v-model="scope.row.resourceCode" @change="changeResource">
                 <el-option
                   v-for="item in resourcesOptions"
-                  :key="item.id"
+                  :key="item.code"
                   :label="item.name"
-                  :value="item.id"
+                  :value="item.code"
                 ></el-option>
               </el-select>
             </template>
           </el-table-column>
           <el-table-column label="云服务" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.description" @change="change()">
+              <el-select v-model="scope.row.serviceCode" @change="changeService">
                 <el-option
                   v-for="item in cloudServiceOptions"
                   :key="item.id"
@@ -31,52 +31,29 @@
 
           <el-table-column label="SKU数量" align="center">
             <template slot-scope="scope">
-              <!-- <el-input v-model="scope.row.showname"></el-input> -->
+              <el-input disabled v-model="scope.row.skuNumber"></el-input>
             </template>
           </el-table-column>
           <el-table-column label="云服务编码" align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.name"></el-input>
+              <el-input disabled v-model="scope.row.serviceCode"></el-input>
             </template>
           </el-table-column>
-
           <el-table-column label="参数组名称" align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.default"></el-input>
+              <el-input disabled v-model="scope.row.parameName"></el-input>
             </template>
           </el-table-column>
           <el-table-column label="参数组编码" align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.rule"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-              <el-link class="link" type="danger" @click="deleteList(scope.row)"
-                >移除</el-link
-              >
+              <el-input disabled v-model="scope.row.parameCode"></el-input>
             </template>
           </el-table-column>
         </el-table>
       </el-col>
-      <el-col>
-        <el-col :span="2" class="addBtnCol">
-          <el-button @click="add()" class="addBtn">
-            <img
-              src="web/static/images/attribute/jiahao.png"
-              alt
-              style="width:12%;"
-            />
-            新增一条
-          </el-button>
-        </el-col>
-      </el-col>
     </el-row>
 
-    <el-row
-      class="right"
-      style="padding:50px;padding-top:0px;padding-right:70px;"
-    >
+    <el-row class="right" style="padding:50px;padding-top:0px;padding-right:70px;">
       <el-button type="primary" @click="nexttop()">上一步</el-button>
       <el-button type="primary" @click="nextbottom()">下一步</el-button>
     </el-row>
@@ -84,22 +61,34 @@
 </template>
 
 <script>
-import { getResourcesList, getCloudServiceList } from "@/api/serviceOperating";
+import {
+  getResourcesList,
+  getCloudServiceList,
+  queryByIdCloudServiceSku,
+  queryByIdCloudServiceParams,
+  getSKUList,
+  getParams,
+} from "@/api/serviceOperating";
 import { requestParams, parseHash } from "@/utils/urlParam";
+import { editcloudproductimg } from "@/api/serviceOperatingcms";
 export default {
   props: {
     active: {
       type: Number,
-      default: 2
+      default: 2,
     },
     active3: {
       type: Number,
-      default: 4
+      default: 4,
     },
     cloudproduct: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
+    id: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -107,32 +96,13 @@ export default {
       cloudServiceOptions: [],
       list: [
         {
-          index: 1,
-          showname: "1",
-          name: "1",
-          attribute: "",
-          type: "",
-          top: true,
-          down: false,
-          must: true,
-          default: "",
-          rule: "",
-          description: ""
+          resourceCode: "",
+          serviceCode: "",
+          skuNumber: 0,
+          parameName: "",
+          parameCode: "",
         },
-        {
-          index: 2,
-          showname: "2",
-          name: "2",
-          attribute: "",
-          type: "",
-          must: true,
-          top: false,
-          down: true,
-          default: "",
-          rule: "",
-          description: ""
-        }
-      ]
+      ],
     };
   },
   mounted() {
@@ -140,29 +110,34 @@ export default {
   },
   methods: {
     async fetchData() {
+      console.log(this.active);
       const res = await requestParams(getResourcesList, this.search);
       this.resourcesOptions = res.content.content;
-      const res1 = await requestParams(getCloudServiceList, this.search);
-      this.cloudServiceOptions = res1.content.content;
     },
-    //新增一条
-    add() {
-      var obj = {
-        index: null,
-        showname: "",
-        name: "",
-        attribute: "parameterpath",
-        type: "String",
-        top: false,
-        down: false,
-        must: true,
-        default: "",
-        rule: "",
-        description: ""
+    changeService(data) {
+      let search = {
+        page: 1,
+        rows: 100,
+        serviceCode: data,
       };
-      obj.index = this.list.length + 1;
-      this.list.push(obj);
-      this.change();
+      getSKUList(search).then((r) => {
+        this.list[0].skuNumber = r.content.content.length;
+      });
+
+      getParams(search).then((r) => {
+        r.content.content.forEach((item) => {
+          if (item.status == "PUBLISH") {
+            this.list[0].parameName = item.name;
+            this.list[0].parameCode = item.code;
+          }
+        });
+      });
+    },
+    changeResource(code) {
+      let search = { page: 1, rows: 100, resourceCode: code };
+      getCloudServiceList(search).then((r) => {
+        this.cloudServiceOptions = r.content.content;
+      });
     },
     change() {
       //console.log("aaa");
@@ -171,9 +146,24 @@ export default {
       this.$emit("listenToChildEvent", this.active);
     },
     nextbottom() {
-      this.$emit("listenToChildEvent", this.active3);
-    }
-  }
+      const params = new FormData();
+      console.log(this.id);
+      params.append("resourceCode", this.list[0].resourceCode);
+      params.append("serviceCode", this.list[0].serviceCode);
+      params.append("parameName", this.list[0].parameName);
+      params.append("parameCode", this.list[0].parameCode);
+      editcloudproductimg(this.id, params).then((r) => {
+        if (r.id != "") {
+          this.$emit("listenToChildEvent", this.active3);
+        } else {
+          this.$notify({
+            type: "info",
+            message: "修改失败",
+          });
+        }
+      });
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
