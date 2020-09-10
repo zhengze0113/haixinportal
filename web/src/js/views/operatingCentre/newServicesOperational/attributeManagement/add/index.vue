@@ -235,6 +235,20 @@
                 </el-form-item>
               </template>
             </el-table-column>
+            <el-table-column label="是否内置" align="center">
+              <template slot-scope="scope">
+                <el-form-item>
+                  <el-checkbox v-model="scope.row.ifBuildIn" />
+                </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否编辑" align="center">
+              <template slot-scope="scope">
+                <el-form-item>
+                  <el-checkbox v-model="scope.row.ifEdit" />
+                </el-form-item>
+              </template>
+            </el-table-column>
             <el-table-column label="默认值" align="center">
               <template slot-scope="scope">
                 <el-form-item>
@@ -246,6 +260,13 @@
               <template slot-scope="scope">
                 <el-form-item>
                   <el-input v-model="scope.row.checkRule" />
+                </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column label="校检提示语" align="center">
+              <template slot-scope="scope">
+                <el-form-item>
+                  <el-input v-model="scope.row.checkPromptMessage" />
                 </el-form-item>
               </template>
             </el-table-column>
@@ -307,6 +328,9 @@ export default {
             defaultValue: "",
             checkRule: "",
             description: "",
+            ifBuildIn: false,
+            ifEdit: true,
+            checkPromptMessage: "",
           },
         ],
       },
@@ -424,8 +448,8 @@ export default {
           label: "String",
         },
         {
-          value: "Int",
-          label: "Int",
+          value: "Number",
+          label: "Number",
         },
         {
           value: "Long",
@@ -442,6 +466,14 @@ export default {
         {
           value: "Boolean",
           label: "Boolean",
+        },
+        {
+          value: "Array",
+          label: "Array",
+        },
+        {
+          value: "Select",
+          label: "Select",
         },
       ],
       addList: {
@@ -542,6 +574,9 @@ export default {
         defaultValue: "",
         checkRule: "",
         description: "",
+        ifBuildIn: false,
+        ifEdit: true,
+        checkPromptMessage: "",
       };
       obj.index = this.list.cloudParametersPar.length + 1;
       this.list.cloudParametersPar.push(obj);

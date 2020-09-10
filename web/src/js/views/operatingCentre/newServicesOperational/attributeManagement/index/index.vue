@@ -68,7 +68,7 @@
             @row-click="handleRowClick"
             @selection-change="handleSelectionChange"
           >
-            <el-table-column label="参数组编码" align="center" fixed="left">
+            <el-table-column label="参数组编码" align="center" >
               <template slot-scope="scope">
                 <router-link
                   :to="{path: '/operatingCentre/newServicesOperational/attributeManagement/detail/'+scope.row.id}"

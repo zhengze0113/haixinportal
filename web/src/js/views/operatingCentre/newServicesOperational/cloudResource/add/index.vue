@@ -102,8 +102,9 @@
             <el-col :span="20" :offset="1">
               <el-form-item
                 prop="port"
+                label="端口："
                 :rules="[
-                     { type: 'number', message: '端口号必须为数字值' },
+                    { type: 'number', message: '端口号必须为数字值' },
                     {
                       pattern: /^([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/g,
                       message: '范围需为（80～65535）',
@@ -111,7 +112,6 @@
                     }
                   ]"
               >
-                <span slot="label" class="labelText">端口：</span>
                 <el-input v-model="cloudServiceFrom.port" placeholder="请输入端口号" />
               </el-form-item>
             </el-col>
@@ -162,10 +162,7 @@
             <el-col :span="20" :offset="1">
               <el-form-item prop="description" style="width:100%">
                 <span slot="label" class="labelText">描述：</span>
-                <el-input
-                  v-model="cloudServiceFrom.description"
-                  type="textarea"
-                />
+                <el-input v-model="cloudServiceFrom.description" type="textarea" />
               </el-form-item>
             </el-col>
           </el-form>
@@ -215,22 +212,15 @@ export default {
         },
       ],
       cloudServiceFrom: {
-        description: "",
-        expireTime: "",
-        icon: "",
-        isPublic: true,
-        isSubSupported: true,
-        menderId: 0,
         name: "",
-        namespace: "",
-        onlineTime: "",
-        orgId: 0,
-        ownerId: 0,
-        status: "",
+        platform: "",
         keyword: "",
-        tenantId: 0,
-        url: "",
-        version: "",
+        masterIp: "",
+        port: 0,
+        proxy: "",
+        token: "",
+        monitorAddress: "",
+        description: "",
       },
       formCloud: false,
       formEntry: false,

@@ -60,7 +60,7 @@
             @row-click="handleRowClick"
             @selection-change="handleSelectionChange"
           >
-            <el-table-column label="服务编码" align="center" fixed="left">
+            <el-table-column label="服务编码" align="center" >
               <template slot-scope="scope">
                 <router-link
                   :to="{path: '/operatingCentre/newServicesOperational/cloudService/detail/'+scope.row.id}"

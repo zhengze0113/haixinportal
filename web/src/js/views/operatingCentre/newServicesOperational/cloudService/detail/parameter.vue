@@ -13,7 +13,7 @@
             highlight-current-row
             row-key="id"
           >
-            <el-table-column label="参数列表编码" align="center" fixed="left">
+            <el-table-column label="参数列表编码" align="center" >
               <template slot-scope="scope">
                 <span>{{ scope.row.code }}</span>
               </template>
